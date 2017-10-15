@@ -8,6 +8,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
@@ -16,7 +17,7 @@ public class Mesh {
     private final VertexArrayObject vao;
     private final VertexBufferObject vbo;
     private final VertexBufferObject vboIdx;
-    //private final VertexBufferObject vboCol;
+    private final VertexBufferObject vboCol;
     private final int vtxCount;
 
     public Mesh(float[] positions, float[] colors, int[] indices){
@@ -30,14 +31,16 @@ public class Mesh {
             vbo = new VertexBufferObject();
             vbo.bind(GL_ARRAY_BUFFER);
             vbo.uploadData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-            //glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             // Color data
-            /*FloatBuffer colorBuf = stack.mallocFloat(colors.length);
+            FloatBuffer colorBuf = stack.mallocFloat(colors.length);
             colorBuf.put(colors).flip();
             vboCol = new VertexBufferObject();
             vboCol.bind(GL_ARRAY_BUFFER);
             vboCol.uploadData(GL_ARRAY_BUFFER, colorBuf, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);*/
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
             // Index data
             IntBuffer indiciesBuf = stack.mallocInt(vtxCount);
             indiciesBuf.put(indices).flip();
@@ -66,7 +69,7 @@ public class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         vbo.delete();
         vboIdx.delete();
-        //vboCol.delete();
+        vboCol.delete();
         // Delete the VAO
         vao.delete();
     }

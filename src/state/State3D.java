@@ -25,18 +25,18 @@ public class State3D implements State {
             //= "#version 150 core\n"
             = "#version 330\n"
             + "\n"
-            + "in vec3 position;\n"
-            //+ "layout (location=0) in vec3 position;\n"
-            //+ "layout (location=1) in vec3 color;\n"
+            //+ "in vec3 position;\n"
+            + "layout (location=0) in vec3 position;\n"
+            + "layout (location=1) in vec3 color;\n"
             + "\n"
-            //+ "out vec3 vertexColor;\n"
+            + "out vec3 vertexColor;\n"
             + "\n"
             + "uniform mat4 model;\n"
             + "uniform mat4 view;\n"
             + "uniform mat4 projection;\n"
             + "\n"
             + "void main() {\n"
-            //+ "    vertexColor = color;\n"
+            + "    vertexColor = color;\n"
             + "    mat4 mvp = projection * view * model;\n"
             + "    gl_Position = mvp * vec4(position, 1.0);\n"
             + "}";
@@ -44,12 +44,12 @@ public class State3D implements State {
             //= "#version 150 core\n"
             = "#version 330\n"
             + "\n"
-            //+ "in vec3 vertexColor;\n"
+            + "in vec3 vertexColor;\n"
             + "\n"
             + "out vec4 fragColor;\n"
             + "\n"
             + "void main() {\n"
-            + "    fragColor = vec4(0.5,0.5,0.5, 1.0);\n"
+            + "    fragColor = vec4(vertexColor, 1.0);\n"
             + "}";
 
     private Mesh mesh;
@@ -118,7 +118,7 @@ public class State3D implements State {
         program.link();
         program.use();
 
-        specifyVertexAttributes();
+        //specifyVertexAttributes();
 
         /* Get uniform location for the model matrix */
         uniModel = program.getUniformLocation("model");
@@ -157,8 +157,8 @@ public class State3D implements State {
         /* Specify Vertex Pointer */
         int posAttrib = program.getAttributeLocation("position");
         program.enableVertexAttribute(posAttrib);
-        //program.pointVertexAttribute(posAttrib, 3, 0, 0);
-        program.pointVertexAttribute(posAttrib, 3, 3 * Float.BYTES, 0);
+        program.pointVertexAttribute(posAttrib, 3, 0, 0);
+        //program.pointVertexAttribute(posAttrib, 3, 3 * Float.BYTES, 0);
         // Specify color pointer
         //int colAttrib = program.getAttributeLocation("color");
         //program.enableVertexAttribute(colAttrib);
