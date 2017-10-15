@@ -19,16 +19,13 @@ import static org.lwjgl.opengl.GL20.*;
 public class State3D implements State {
 
     private final CharSequence vertexSource
-            //= "#version 150 core\n"
             = "#version 330\n"
             + "\n"
-            //+ "in vec3 position;\n"
             + "layout (location=0) in vec3 position;\n"
             + "layout (location=1) in vec3 color;\n"
             + "\n"
             + "out vec3 vertexColor;\n"
             + "\n"
-            //+ "uniform mat4 model;\n"
             + "uniform mat4 world;\n"
             + "uniform mat4 projection;\n"
             + "\n"
@@ -38,7 +35,6 @@ public class State3D implements State {
             + "    gl_Position = mvp * vec4(position, 1.0);\n"
             + "}";
     private final CharSequence fragmentSource
-            //= "#version 150 core\n"
             = "#version 330\n"
             + "\n"
             + "in vec3 vertexColor;\n"
@@ -55,7 +51,6 @@ public class State3D implements State {
     private Shader fragmentShader;
     private ShaderProgram program;
 
-    private int uniModel;
     private float previousAngle = 0f;
     private float angle = 0f;
     private final float angelPerSecond = 90f;
@@ -77,13 +72,20 @@ public class State3D implements State {
 
     @Override
     public void render(float alpha) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
         program.use();
 
         updateProjection();
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+            // Update rotation angle
+            float rotation = gameItem.getRotation().x + 1.5f;
+            if ( rotation > 360 ) {
+                rotation = 0;
+            }
+            gameItem.setRotation(rotation, rotation, rotation);
+
             // Set world matrix for this item
             Matrix4f worldMatrix = transformation.getWorldMatrix(
                             gameItem.getPosition(),
@@ -98,22 +100,47 @@ public class State3D implements State {
     @Override
     public void enter() {
         transformation = new Transformation();
-
-        // Create the Mesh
-        float[] positions = new float[]{
+        float[] positions = new float[] {
+                // VO
                 -0.5f,  0.5f,  0.5f,
+                // V1
                 -0.5f, -0.5f,  0.5f,
+                // V2
                 0.5f, -0.5f,  0.5f,
+                // V3
                 0.5f,  0.5f,  0.5f,
+                // V4
+                -0.5f,  0.5f, -0.5f,
+                // V5
+                0.5f,  0.5f, -0.5f,
+                // V6
+                -0.5f, -0.5f, -0.5f,
+                // V7
+                0.5f, -0.5f, -0.5f,
         };
         float[] colours = new float[]{
                 0.5f, 0.0f, 0.0f,
                 0.0f, 0.5f, 0.0f,
                 0.0f, 0.0f, 0.5f,
                 0.0f, 0.5f, 0.5f,
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
         };
-        int[] indices = new int[]{
+        int[] indices = new int[] {
+                // Front face
                 0, 1, 3, 3, 1, 2,
+                // Top Face
+                4, 0, 3, 5, 4, 3,
+                // Right face
+                3, 2, 7, 5, 3, 7,
+                // Left face
+                6, 1, 0, 6, 0, 4,
+                // Bottom face
+                2, 1, 6, 2, 6, 7,
+                // Back face
+                7, 6, 4, 7, 4, 5,
         };
         Mesh mesh = new Mesh(positions, colours, indices);
         GameItem gameItem = new GameItem(mesh);

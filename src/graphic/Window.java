@@ -6,6 +6,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -50,6 +52,7 @@ public class Window {
         //glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
+
         /* Create window with specified OpenGL context */
         id = glfwCreateWindow(width, height, title, NULL, NULL);
         if (id == NULL) {
@@ -73,8 +76,6 @@ public class Window {
             glfwSwapInterval(1);
         }
 
-
-
         /* Set key callback */
         keyCallback = new GLFWKeyCallback() {
             @Override
@@ -85,6 +86,8 @@ public class Window {
             }
         };
         glfwSetKeyCallback(id, keyCallback);
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     /**
