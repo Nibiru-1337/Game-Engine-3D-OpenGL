@@ -48,8 +48,8 @@ public class Mesh {
             vboIdx.bind(GL_ELEMENT_ARRAY_BUFFER);
             vboIdx.uploadData(GL_ELEMENT_ARRAY_BUFFER, indiciesBuf, GL_STATIC_DRAW);}
 
-            //glBindBuffer(GL_ARRAY_BUFFER, 0);
-            //glBindVertexArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
     }
 
     public int getVaoId() {

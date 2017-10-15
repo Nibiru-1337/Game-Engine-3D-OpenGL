@@ -52,6 +52,7 @@ public class State3D implements State {
             + "    fragColor = vec4(vertexColor, 1.0);\n"
             + "}";
 
+    private Transformation transformation;
     private Mesh mesh;
     private Shader vertexShader;
     private Shader fragmentShader;
@@ -80,21 +81,21 @@ public class State3D implements State {
         mesh.bind();
         program.use();
 
-        Matrix4f model = new Matrix4f().identity();
-        program.setUniform(uniModel, model);
+
 
         glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
     }
 
     @Override
     public void enter() {
+        transformation = new Transformation();
 
         // Load model
         float[] positions = new float[]{
-                -0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
+                -0.5f,  0.5f, -1.05f,
+                -0.5f, -0.5f, -1.05f,
+                0.5f, -0.5f, -1.05f,
+                0.5f,  0.5f, -1.05f,
         };
         int[] indices = new int[]{
                 0, 1, 3, 3, 1, 2,
@@ -121,7 +122,9 @@ public class State3D implements State {
         //specifyVertexAttributes();
 
         /* Get uniform location for the model matrix */
+        Matrix4f model = new Matrix4f();
         uniModel = program.getUniformLocation("model");
+        program.setUniform(uniModel, model);
 
         /* Set view matrix to identity matrix */
         Matrix4f view = new Matrix4f();
@@ -139,7 +142,8 @@ public class State3D implements State {
         }
 
         /* Set projection matrix to an orthographic projection */
-        Matrix4f projection = new Matrix4f().ortho(-ratio, ratio, -1f, 1f, -1f, 1f);
+        //Matrix4f projection = new Matrix4f().ortho(-ratio, ratio, -1f, 1f, -1f, 1f);
+        Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(60), ratio, 0.01f,1000f);
         int uniProjection = program.getUniformLocation("projection");
         program.setUniform(uniProjection, projection);
 
@@ -151,18 +155,6 @@ public class State3D implements State {
         vertexShader.delete();
         fragmentShader.delete();
         program.delete();
-    }
-
-    private void specifyVertexAttributes() {
-        /* Specify Vertex Pointer */
-        int posAttrib = program.getAttributeLocation("position");
-        program.enableVertexAttribute(posAttrib);
-        program.pointVertexAttribute(posAttrib, 3, 0, 0);
-        //program.pointVertexAttribute(posAttrib, 3, 3 * Float.BYTES, 0);
-        // Specify color pointer
-        //int colAttrib = program.getAttributeLocation("color");
-        //program.enableVertexAttribute(colAttrib);
-        //program.pointVertexAttribute(colAttrib, 3, 0, 0);
     }
 
 }
