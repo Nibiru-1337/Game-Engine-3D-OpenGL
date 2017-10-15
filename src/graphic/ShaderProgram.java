@@ -1,6 +1,9 @@
 package graphic;
 
+import java.lang.Math;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import graphic.Shader;
 import org.joml.*;
@@ -21,12 +24,14 @@ public class ShaderProgram {
      * Stores the handle of the program.
      */
     private final int id;
+    private HashMap uniforms;
 
     /**
      * Creates a shader program.
      */
     public ShaderProgram() {
         id = glCreateProgram();
+        uniforms = new HashMap<String, Integer>();
     }
 
     /**
@@ -107,8 +112,12 @@ public class ShaderProgram {
      *
      * @return Location of the uniform
      */
-    public int getUniformLocation(CharSequence name) {
-        return glGetUniformLocation(id, name);
+    public void createUniform(String name) throws Exception {
+        int uniLocation =  glGetUniformLocation(id, name);
+        if (uniLocation<0){
+            throw new Exception("Could not find uniform:"+name);
+        }
+        uniforms.put(name, uniLocation);
     }
 
     /**
@@ -175,6 +184,10 @@ public class ShaderProgram {
             value.get(buffer);
             glUniformMatrix3fv(location, false, buffer);
         }
+    }
+
+    public void setUniform(String uniform, Matrix4f value){
+
     }
 
     /**

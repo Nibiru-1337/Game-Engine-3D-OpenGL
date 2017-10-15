@@ -125,16 +125,13 @@ public class ExampleState implements State {
         program.use();
 
         specifyVertexAttributes();
+        /*
+        uniModel = program.createUniform("model");
 
-        /* Get uniform location for the model matrix */
-        uniModel = program.getUniformLocation("model");
-
-        /* Set view matrix to identity matrix */
         Matrix4f view = new Matrix4f();
-        int uniView = program.getUniformLocation("view");
+        int uniView = program.createUniform("view");
         program.setUniform(uniView, view);
 
-        /* Get width and height for calculating the ratio */
         float ratio;
         try (MemoryStack stack = MemoryStack.stackPush()) {
             long window = GLFW.glfwGetCurrentContext();
@@ -144,10 +141,9 @@ public class ExampleState implements State {
             ratio = width.get() / (float) height.get();
         }
 
-        /* Set projection matrix to an orthographic projection */
         Matrix4f projection = new Matrix4f().ortho(-ratio, ratio, -1f, 1f, -1f, 1f);
-        int uniProjection = program.getUniformLocation("projection");
-        program.setUniform(uniProjection, projection);
+        int uniProjection = program.createUniform("projection");
+        program.setUniform(uniProjection, projection);*/
     }
 
     @Override

@@ -1,14 +1,8 @@
 package graphic;
 
-import java.awt.FontFormatException;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import core.Game;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
@@ -410,24 +404,21 @@ public class Renderer {
         specifyVertexAttributes();
 
         //TODO: understand!
-        /* Set texture uniform */
-        int uniTex = program.getUniformLocation("texImage");
+        /*
+        int uniTex = program.createUniform("texImage");
         program.setUniform(uniTex, 0);
 
-        /* Set model matrix to identity matrix */
         Matrix4f model = new Matrix4f();
-        int uniModel = program.getUniformLocation("model");
+        int uniModel = program.createUniform("model");
         program.setUniform(uniModel, model);
 
-        /* Set view matrix to identity matrix */
         Matrix4f view = new Matrix4f();
-        int uniView = program.getUniformLocation("view");
+        int uniView = program.createUniform("view");
         program.setUniform(uniView, view);
 
-        /* Set projection matrix to an orthographic projection */
         Matrix4f projection = new Matrix4f().ortho(0f, width, 0f, height, -1f, 1f);
-        int uniProjection = program.getUniformLocation("projection");
-        program.setUniform(uniProjection, projection);
+        int uniProjection = program.createUniform("projection");
+        program.setUniform(uniProjection, projection);*/
     }
 
     /**

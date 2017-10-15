@@ -1,18 +1,15 @@
 package state;
 
 import graphic.*;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 /**
  * This state is for the rendering tutorial.
@@ -31,13 +28,13 @@ public class State3D implements State {
             + "\n"
             + "out vec3 vertexColor;\n"
             + "\n"
-            + "uniform mat4 model;\n"
-            + "uniform mat4 view;\n"
+            //+ "uniform mat4 model;\n"
+            + "uniform mat4 world;\n"
             + "uniform mat4 projection;\n"
             + "\n"
             + "void main() {\n"
             + "    vertexColor = color;\n"
-            + "    mat4 mvp = projection * view * model;\n"
+            + "    mat4 mvp = projection * world;\n"
             + "    gl_Position = mvp * vec4(position, 1.0);\n"
             + "}";
     private final CharSequence fragmentSource
@@ -53,7 +50,7 @@ public class State3D implements State {
             + "}";
 
     private Transformation transformation;
-    private Mesh mesh;
+    private GameItem[] gameItems;
     private Shader vertexShader;
     private Shader fragmentShader;
     private ShaderProgram program;
@@ -62,6 +59,10 @@ public class State3D implements State {
     private float previousAngle = 0f;
     private float angle = 0f;
     private final float angelPerSecond = 90f;
+
+    private static final float FOV = (float) Math.toRadians(60f);
+    private static final float Z_NEAR = 0.01f;
+    private static final float Z_FAR = 1000.f;
 
     @Override
     public void input() {
@@ -77,28 +78,33 @@ public class State3D implements State {
     @Override
     public void render(float alpha) {
         glClear(GL_COLOR_BUFFER_BIT);
-
-        mesh.bind();
         program.use();
 
+        updateProjection();
 
-
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+        // Render each gameItem
+        for(GameItem gameItem : gameItems) {
+            // Set world matrix for this item
+            Matrix4f worldMatrix = transformation.getWorldMatrix(
+                            gameItem.getPosition(),
+                            gameItem.getRotation(),
+                            gameItem.getScale());
+            program.setUniform("worldMatrix", worldMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
     }
 
     @Override
     public void enter() {
         transformation = new Transformation();
 
-        // Load model
+        // Create the Mesh
         float[] positions = new float[]{
-                -0.5f,  0.5f, -1.05f,
-                -0.5f, -0.5f, -1.05f,
-                0.5f, -0.5f, -1.05f,
-                0.5f,  0.5f, -1.05f,
-        };
-        int[] indices = new int[]{
-                0, 1, 3, 3, 1, 2,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+                0.5f, -0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f,
         };
         float[] colours = new float[]{
                 0.5f, 0.0f, 0.0f,
@@ -106,7 +112,13 @@ public class State3D implements State {
                 0.0f, 0.0f, 0.5f,
                 0.0f, 0.5f, 0.5f,
         };
-        mesh = new Mesh(positions, colours, indices);
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
+        };
+        Mesh mesh = new Mesh(positions, colours, indices);
+        GameItem gameItem = new GameItem(mesh);
+        gameItem.setPosition(0, 0, -2);
+        gameItems = new GameItem[] { gameItem };
 
         /* Load shaders */
         vertexShader = Shader.createShader(GL_VERTEX_SHADER, vertexSource);
@@ -121,16 +133,25 @@ public class State3D implements State {
 
         //specifyVertexAttributes();
 
-        /* Get uniform location for the model matrix */
-        Matrix4f model = new Matrix4f();
-        uniModel = program.getUniformLocation("model");
-        program.setUniform(uniModel, model);
+        // Create uniforms
+        try {
+            //Matrix4f model = new Matrix4f();
+            //Matrix4f view = new Matrix4f();
+            Matrix4f projection = new Matrix4f();
+            //program.createUniform("model");
+            //program.setUniform("model", model);
+            //program.createUniform("view");
+            //program.setUniform("view", view);
+            program.createUniform("projection");
+            program.createUniform("world");
+            //program.setUniform("projection", projection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateProjection();
+    }
 
-        /* Set view matrix to identity matrix */
-        Matrix4f view = new Matrix4f();
-        int uniView = program.getUniformLocation("view");
-        program.setUniform(uniView, view);
-
+    private void updateProjection(){
         /* Get width and height for calculating the ratio */
         float ratio;
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -140,18 +161,17 @@ public class State3D implements State {
             GLFW.glfwGetFramebufferSize(window, width, height);
             ratio = width.get() / (float) height.get();
         }
-
         /* Set projection matrix to an orthographic projection */
         //Matrix4f projection = new Matrix4f().ortho(-ratio, ratio, -1f, 1f, -1f, 1f);
-        Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(60), ratio, 0.01f,1000f);
-        int uniProjection = program.getUniformLocation("projection");
-        program.setUniform(uniProjection, projection);
-
+        Matrix4f projection = transformation.getProjectionMatrix(FOV, ratio, Z_NEAR, Z_FAR);
+        program.setUniform("projection", projection);
     }
 
     @Override
     public void exit() {
-        mesh.delete();
+        for (GameItem gameItem : gameItems) {
+            gameItem.getMesh().delete();
+        }
         vertexShader.delete();
         fragmentShader.delete();
         program.delete();

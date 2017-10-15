@@ -13,10 +13,9 @@ public class Transformation {
         projectionMatrix = new Matrix4f();
     }
 
-    public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
-        float aspectRatio = width / height;
+    public final Matrix4f getProjectionMatrix(float fov,float ratio, float zNear, float zFar) {
         projectionMatrix.identity();
-        projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
+        projectionMatrix.perspective(fov, ratio, zNear, zFar);
         return projectionMatrix;
     }
 
