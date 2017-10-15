@@ -1,5 +1,6 @@
-package graphic;
+package engine;
 
+import engine.graphix.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem {

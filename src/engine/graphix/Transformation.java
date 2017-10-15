@@ -1,5 +1,6 @@
-package graphic;
+package engine.graphix;
 
+import engine.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -15,7 +16,8 @@ public class Transformation {
         modelViewMatrix = new Matrix4f();
     }
 
-    public final Matrix4f getProjectionMatrix(float fov,float ratio, float zNear, float zFar) {
+    public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
+        float ratio = width / height;
         projectionMatrix.identity();
         projectionMatrix.perspective(fov, ratio, zNear, zFar);
         return projectionMatrix;

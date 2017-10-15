@@ -1,4 +1,4 @@
-package graphic;
+package engine.graphix;
 
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.*;

@@ -1,4 +1,4 @@
-package graphic;
+package engine.graphix;
 
 import org.joml.Vector3f;
 

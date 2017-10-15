@@ -1,4 +1,4 @@
-package graphic;
+package engine.graphix;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -80,7 +80,7 @@ public class Shader {
      * @param type   Type of the shader
      * @param source Source of the shader
      *
-     * @return Compiled graphic.Shader from the specified source
+     * @return Compiled engine.graphix.Shader from the specified source
      */
     public static Shader createShader(int type, CharSequence source) {
         Shader shader = new Shader(type);
@@ -96,7 +96,7 @@ public class Shader {
      * @param type Type of the shader
      * @param path File path of the shader
      *
-     * @return Compiled graphic.Shader from specified file
+     * @return Compiled engine.graphix.Shader from specified file
      */
     public static Shader loadShader(int type, String path) {
         StringBuilder builder = new StringBuilder();
