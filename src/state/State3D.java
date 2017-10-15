@@ -22,8 +22,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 public class State3D implements State {
 
     private final CharSequence vertexSource
-            = "#version 150 core\n"
-            //= "#version 330\n"
+            //= "#version 150 core\n"
+            = "#version 330\n"
             + "\n"
             + "in vec3 position;\n"
             //+ "layout (location=0) in vec3 position;\n"
@@ -41,8 +41,8 @@ public class State3D implements State {
             + "    gl_Position = mvp * vec4(position, 1.0);\n"
             + "}";
     private final CharSequence fragmentSource
-            = "#version 150 core\n"
-            //= "#version 330\n"
+            //= "#version 150 core\n"
+            = "#version 330\n"
             + "\n"
             //+ "in vec3 vertexColor;\n"
             + "\n"
@@ -158,7 +158,7 @@ public class State3D implements State {
         int posAttrib = program.getAttributeLocation("position");
         program.enableVertexAttribute(posAttrib);
         //program.pointVertexAttribute(posAttrib, 3, 0, 0);
-        program.pointVertexAttribute(posAttrib, 3, 6 * Float.BYTES, 0);
+        program.pointVertexAttribute(posAttrib, 3, 3 * Float.BYTES, 0);
         // Specify color pointer
         //int colAttrib = program.getAttributeLocation("color");
         //program.enableVertexAttribute(colAttrib);

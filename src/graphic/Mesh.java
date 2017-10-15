@@ -6,7 +6,9 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Mesh {
@@ -17,10 +19,10 @@ public class Mesh {
     //private final VertexBufferObject vboCol;
     private final int vtxCount;
 
-    public Mesh(float[] positions, float[] colors, int[] indicies){
+    public Mesh(float[] positions, float[] colors, int[] indices){
         vao = new VertexArrayObject();
         vao.bind();
-        vtxCount = indicies.length;
+        vtxCount = indices.length;
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Vertex data
             FloatBuffer vertices = stack.mallocFloat(positions.length);
@@ -28,15 +30,17 @@ public class Mesh {
             vbo = new VertexBufferObject();
             vbo.bind(GL_ARRAY_BUFFER);
             vbo.uploadData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+            //glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             // Color data
             /*FloatBuffer colorBuf = stack.mallocFloat(colors.length);
             colorBuf.put(colors).flip();
             vboCol = new VertexBufferObject();
             vboCol.bind(GL_ARRAY_BUFFER);
-            vboCol.uploadData(GL_ARRAY_BUFFER, colorBuf, GL_STATIC_DRAW);*/
+            vboCol.uploadData(GL_ARRAY_BUFFER, colorBuf, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);*/
             // Index data
             IntBuffer indiciesBuf = stack.mallocInt(vtxCount);
-            indiciesBuf.put(indicies).flip();
+            indiciesBuf.put(indices).flip();
             vboIdx = new VertexBufferObject();
             vboIdx.bind(GL_ELEMENT_ARRAY_BUFFER);
             vboIdx.uploadData(GL_ELEMENT_ARRAY_BUFFER, indiciesBuf, GL_STATIC_DRAW);}
