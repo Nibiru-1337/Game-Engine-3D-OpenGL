@@ -89,7 +89,7 @@ public class State3D implements State {
                             gameItem.getPosition(),
                             gameItem.getRotation(),
                             gameItem.getScale());
-            program.setUniform("worldMatrix", worldMatrix);
+            program.setUniform("world", worldMatrix);
             // Render the mesh for this game item
             gameItem.getMesh().render();
         }

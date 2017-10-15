@@ -24,14 +24,14 @@ public class ShaderProgram {
      * Stores the handle of the program.
      */
     private final int id;
-    private HashMap uniforms;
+    private HashMap<String, Integer> uniforms;
 
     /**
      * Creates a shader program.
      */
     public ShaderProgram() {
         id = glCreateProgram();
-        uniforms = new HashMap<String, Integer>();
+        uniforms = new HashMap<>();
     }
 
     /**
@@ -187,7 +187,12 @@ public class ShaderProgram {
     }
 
     public void setUniform(String uniform, Matrix4f value){
-
+        // Dump the matrix into a float buffer
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            FloatBuffer fb = stack.mallocFloat(16);
+            value.get(fb);
+            glUniformMatrix4fv(uniforms.get(uniform), false, fb);
+        }
     }
 
     /**
