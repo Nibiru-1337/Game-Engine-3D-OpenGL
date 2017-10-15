@@ -75,24 +75,18 @@ public class State3D implements State {
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
         program.use();
 
+        // Update projection
         updateProjection();
+
+        // Update view
+        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
-            // Update rotation angle
-            float rotation = gameItem.getRotation().x + 1.5f;
-            if ( rotation > 360 ) {
-                rotation = 0;
-            }
-            gameItem.setRotation(rotation, rotation, rotation);
-
-            // Set world matrix for this item
-            Matrix4f worldMatrix = transformation.getWorldMatrix(
-                            gameItem.getPosition(),
-                            gameItem.getRotation(),
-                            gameItem.getScale());
-            program.setUniform("world", worldMatrix);
-            // Render the mesh for this game item
+            // Set model view matrix for this item
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            program.setUniform("modelView", modelViewMatrix);
+            // Render the mes for this game item
             gameItem.getMesh().render();
         }
     }
@@ -162,16 +156,9 @@ public class State3D implements State {
 
         // Create uniforms
         try {
-            //Matrix4f model = new Matrix4f();
-            //Matrix4f view = new Matrix4f();
-            Matrix4f projection = new Matrix4f();
-            //program.createUniform("model");
-            //program.setUniform("model", model);
-            //program.createUniform("view");
-            //program.setUniform("view", view);
+            program.createUniform("modelView");
             program.createUniform("projection");
             program.createUniform("world");
-            //program.setUniform("projection", projection);
         } catch (Exception e) {
             e.printStackTrace();
         }
