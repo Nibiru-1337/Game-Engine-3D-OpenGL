@@ -67,7 +67,7 @@ public class Renderer3D {
             // Set model view matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             program.setUniform("modelView", modelViewMatrix);
-            // Render the mes for this game item
+            // Render the mesh for this game item
             gameItem.getMesh().render();
         }
 

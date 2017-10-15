@@ -6,6 +6,7 @@ import engine.MouseInput;
 import engine.Window;
 import engine.graphix.Camera;
 import engine.graphix.Mesh;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -96,7 +97,16 @@ public class Scene3D implements IGameLogic {
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
+        // Update camera position
+        camera.movePosition(cameraInc.x * CAMERA_POS_STEP,
+                cameraInc.y * CAMERA_POS_STEP,
+                cameraInc.z * CAMERA_POS_STEP);
 
+        // Update camera based on mouse
+        if (mouseInput.isRightButtonPressed()) {
+            Vector2f rotVec = mouseInput.getDisplVec();
+            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+        }
     }
 
     @Override
