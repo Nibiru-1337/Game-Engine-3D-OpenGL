@@ -59,20 +59,23 @@ public class Scene3D implements IGameLogic {
                 7, 6, 4, 7, 4, 5,
         };
         //Texture texture = new Texture("/textures/grassblock.png");
-        Mesh mesh = new Mesh(positions, colours, indices);
-        GameItem gameItem1 = new GameItem(mesh);
+        Sphere s = new Sphere(1f);
+        Mesh boxMesh = new Mesh(positions, colours, indices);
+        Mesh sphereMesh = new Mesh(s.getVertices(),s.getColors(),s.getIndices());
+        GameItem gameItem1 = new GameItem(boxMesh);
         gameItem1.setScale(0.5f);
         gameItem1.setPosition(0, 0, -2);
-        GameItem gameItem2 = new GameItem(mesh);
+        GameItem gameItem2 = new GameItem(sphereMesh);
         gameItem2.setScale(0.5f);
-        gameItem2.setPosition(0.5f, 0.5f, -2);
-        GameItem gameItem3 = new GameItem(mesh);
+        gameItem2.setPosition(0, 0.75f, -2);
+        /*GameItem gameItem3 = new GameItem(boxMesh);
         gameItem3.setScale(0.5f);
         gameItem3.setPosition(0, 0, -2.5f);
-        GameItem gameItem4 = new GameItem(mesh);
+        GameItem gameItem4 = new GameItem(boxMesh);
         gameItem4.setScale(0.5f);
-        gameItem4.setPosition(0.5f, 0, -2.5f);
-        gameItems = new GameItem[]{gameItem1, gameItem2, gameItem3, gameItem4};
+        gameItem4.setPosition(0.5f, 0, -2.5f);*/
+
+        gameItems = new GameItem[]{gameItem1, gameItem2};
     }
 
     @Override
@@ -103,7 +106,7 @@ public class Scene3D implements IGameLogic {
                 cameraInc.z * CAMERA_POS_STEP);
 
         // Update camera based on mouse
-        if (mouseInput.isRightButtonPressed()) {
+        if (mouseInput.isLeftButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
