@@ -3,10 +3,7 @@ package game;
 import engine.GameItem;
 import engine.Utils;
 import engine.Window;
-import engine.graphix.Camera;
-import engine.graphix.Shader;
-import engine.graphix.ShaderProgram;
-import engine.graphix.Transformation;
+import engine.graphix.*;
 import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -21,8 +18,6 @@ public class Renderer3D {
 
     private final Transformation transformation;
     private GameItem[] gameItems;
-    private Shader vertexShader;
-    private Shader fragmentShader;
     private ShaderProgram program;
 
     public Renderer3D() {
@@ -32,13 +27,16 @@ public class Renderer3D {
     public void init(Window window) throws Exception {
         // Create shader
         program = new ShaderProgram();
-        program.createVertexShader(Utils.loadResource("src/shaders/vertex.vs"));
-        program.createFragmentShader(Utils.loadResource("src/shaders/fragment.fs"));
+        program.createVertexShader(Utils.loadResource("src/resources/shaders/vertex.vs"));
+        program.createFragmentShader(Utils.loadResource("src/resources/shaders/fragment.fs"));
         program.link();
 
         // Create uniforms for modelView and projection matrices and texture
         program.createUniform("modelView");
         program.createUniform("projection");
+        // Create uniform for default colour and the flag that controls it
+        program.createUniform("color");
+        program.createUniform("useColor");
     }
 
     public void clear() {
@@ -64,9 +62,13 @@ public class Renderer3D {
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+            Mesh mesh = gameItem.getMesh();
             // Set model view matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             program.setUniform("modelView", modelViewMatrix);
+            // Set its color / texture uniforms
+            program.setUniform("color", mesh.getColor());
+            program.setUniform("useColor", mesh.isTextured() ? 0 : 1);
             // Render the mesh for this game item
             gameItem.getMesh().render();
         }

@@ -1,9 +1,10 @@
-package game;
+package game.meshes;
 
 public class PlaneMesh {
 
     private float[] positions;
-    private float[] colors;
+    private float[] texCoords;
+    private float[] normals;
     private int[] indices;
 
     public PlaneMesh(){
@@ -13,12 +14,11 @@ public class PlaneMesh {
                 0.5f, -0.5f, 0.0f,
                 0.5f,  0.5f, 0.0f,
         };
-        colors = new float[]{
-                0.0f, 0.4f, 0.6f,
-                0.0f, 0.4f, 0.6f,
-                0.0f, 0.4f, 0.6f,
-                0.0f, 0.4f, 0.6f,
-        };
+
+        texCoords = new float[]{};
+
+        normals = new float[]{};
+
         indices = new int[] {
                 0, 1, 3, 3, 1, 2,
         };
@@ -28,8 +28,12 @@ public class PlaneMesh {
         return positions;
     }
 
-    public float[] getColors(){
-        return colors;
+    public float[] getTexCoords() {
+        return texCoords;
+    }
+
+    public float[] getNormals() {
+        return normals;
     }
 
     public int[] getIndices(){

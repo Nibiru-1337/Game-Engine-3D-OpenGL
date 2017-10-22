@@ -6,6 +6,9 @@ import engine.MouseInput;
 import engine.Window;
 import engine.graphix.Camera;
 import engine.graphix.Mesh;
+import engine.graphix.OBJLoader;
+import game.meshes.PlaneMesh;
+import game.meshes.SphereMesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -32,26 +35,45 @@ public class Scene3D implements IGameLogic {
         renderer.init(window);
         //Texture texture = new Texture("/textures/grassblock.png");
         //load meshes
-        PlaneMesh plane = new PlaneMesh();
         SphereMesh s = new SphereMesh(1f);
-        BoxMesh box = new BoxMesh();
-        Mesh boxMesh = new Mesh(box.getPositions(), box.getColors(), box.getIndices());
-        Mesh floorMesh = new Mesh(plane.getPositions(), plane.getColors(), plane.getIndices());
-        Mesh sphereMesh = new Mesh(s.getVertices(),s.getColors(),s.getIndices());
+        Mesh sphereMesh = new Mesh(s.getVertices(),new float[0], new float[0], s.getIndices());
+        sphereMesh.setColour(new Vector3f(0.9f, 0.85f, 0.5f));
+
+        PlaneMesh plane = new PlaneMesh();
+        Mesh floorMesh = new Mesh(plane.getPositions(), plane.getTexCoords(),plane.getNormals(), plane.getIndices());
+        floorMesh.setColour(new Vector3f(0.0f,0.4f,0.6f));
+
+        Mesh boxMesh = OBJLoader.loadMesh("src/resources/models/cube.obj");
+        boxMesh.setColour(new Vector3f(0.54f, 0.27f, 0.07f));
+
+        Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
+        palmMesh.setColour(new Vector3f(0.33f, 0.41f, 0.18f));
+
         //make game item objects
+        GameItem palm1 = new GameItem(palmMesh);
+        palm1.setPosition(-0.5f,0,-5);
+        palm1.setRotation(0,25f,-10f);
+        palm1.setScale(0.005f);
+
+        GameItem palm2 = new GameItem(palmMesh);
+        palm2.setPosition(0.3f,0,-4);
+        palm2.setScale(0.005f);
+
         GameItem box1 = new GameItem(boxMesh);
-        box1.setScale(0.5f);
-        box1.setPosition(0, 0.75f, -4);
+        box1.setScale(0.2f);
+        box1.setPosition(0, 0.7f, -5);
+
         GameItem island = new GameItem(sphereMesh);
         island.setScale(2.0f);
-        island.setPosition(0, -1.5f, -4);
+        island.setPosition(0, -1.5f, -5);
         island.setRotation(0,0,180f);
+
         GameItem sea = new GameItem(floorMesh);
         sea.setScale(20.0f);
         sea.setPosition(0, -0.1f, -2.5f);
         sea.setRotation(90f,0f,0);
 
-        gameItems = new GameItem[]{sea, island, box1 };
+        gameItems = new GameItem[]{sea, island, box1, palm1, palm2 };
     }
 
     @Override
@@ -67,9 +89,10 @@ public class Scene3D implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
             cameraInc.x = 1;
         }
-        if (window.isKeyPressed(GLFW_KEY_E)) {
-            cameraInc.y = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_Q)) {
+        if (window.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+            //if (camera.getPosition().y > 0)
+                cameraInc.y = -1;
+        } else if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             cameraInc.y = 1;
         }
     }

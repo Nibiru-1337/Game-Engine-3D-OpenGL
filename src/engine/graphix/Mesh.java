@@ -1,5 +1,6 @@
 package engine.graphix;
 
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
@@ -15,11 +16,15 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Mesh {
 
+    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
+
     private final VertexArrayObject vao;
     private final ArrayList<VertexBufferObject> vboList;
     private final int vtxCount;
+    private Vector3f color;
 
-    public Mesh(float[] positions, float[] colors, int[] indices){
+    public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
+        color = DEFAULT_COLOUR;
         vao = new VertexArrayObject();
         vao.bind();
         vtxCount = indices.length;
@@ -31,19 +36,27 @@ public class Mesh {
             VertexBufferObject vboPos = new VertexBufferObject();
             vboPos.bind(GL_ARRAY_BUFFER);
             vboPos.uploadData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             vboList.add(vboPos);
 
-            // Color data
-            FloatBuffer colorBuf = stack.mallocFloat(colors.length);
-            colorBuf.put(colors).flip();
-            VertexBufferObject vboCol = new VertexBufferObject();
-            vboCol.bind(GL_ARRAY_BUFFER);
-            vboCol.uploadData(GL_ARRAY_BUFFER, colorBuf, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
-            vboList.add(vboCol);
+            // Texture coordinates VBO
+            FloatBuffer textCoordsBuffer = stack.mallocFloat(textCoords.length);
+            textCoordsBuffer.put(textCoords).flip();
+            VertexBufferObject vboTex = new VertexBufferObject();
+            vboTex.bind(GL_ARRAY_BUFFER);
+            vboTex.uploadData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            vboList.add(vboTex);
+
+            // Vertex normals VBO
+            FloatBuffer vecNormalsBuffer = stack.mallocFloat(positions.length);
+            vecNormalsBuffer.put(normals).flip();
+            VertexBufferObject vboNor = new VertexBufferObject();
+            vboNor.bind(GL_ARRAY_BUFFER);
+            vboNor.uploadData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+            vboList.add(vboNor);
+
             // Index data
             IntBuffer indiciesBuf = stack.mallocInt(vtxCount);
             indiciesBuf.put(indices).flip();
@@ -62,13 +75,31 @@ public class Mesh {
         bind();
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
 
         // Restore state
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         glBindVertexArray(0);
+
+        // TODO: check if texture is null b4 using
+        //glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public boolean isTextured() {
+        return false;
+        //return this.texture != null;
+    }
+
+    public void setColour(Vector3f color) {
+        this.color = color;
+    }
+
+    public Vector3f getColor() {
+        return this.color;
     }
 
     public int getVaoId() {
@@ -91,5 +122,6 @@ public class Mesh {
         }
         // Delete the VAO
         vao.delete();
+        // TODO: check if texture is null b4 using
     }
 }
