@@ -1,19 +1,21 @@
 package game;
 
+import org.joml.Matrix4f;
+
 import java.util.ArrayList;
 
-public class Sphere {
+public class SphereMesh {
 
     private ArrayList<Float> positions = new ArrayList<>();
     private ArrayList<Float> colors = new ArrayList<>();
     private ArrayList<Integer> indices = new ArrayList<>();
 
-    public Sphere(float radius) {
+    public SphereMesh(float radius) {
         generate(
                 radius,
-                8, 6,
+                32, 32,
                 0, Math.PI * 2,
-                0, Math.PI);
+                Math.PI/2, Math.PI);
     }
 
     private void generate(
@@ -43,8 +45,8 @@ public class Sphere {
                 positions.add(px);
                 positions.add(py);
                 positions.add(pz);
-                colors.add(0.5f);
-                colors.add(0.5f);
+                colors.add(0.9f);
+                colors.add(0.85f);
                 colors.add(0.5f);
 
                 verticesRow.add(index);

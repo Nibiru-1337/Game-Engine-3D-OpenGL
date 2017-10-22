@@ -26,56 +26,32 @@ public class Scene3D implements IGameLogic {
         cameraInc = new Vector3f(0, 0, 0);
     }
 
+
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
-        // Create the Mesh
-        float[] positions = new float[] {
-                -0.5f,  0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-                0.5f, -0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f,
-                0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-        };
-        float[] colours = new float[]{
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
-        };
-        int[] indices = new int[] {
-                0, 1, 3, 3, 1, 2,
-                4, 0, 3, 5, 4, 3,
-                3, 2, 7, 5, 3, 7,
-                6, 1, 0, 6, 0, 4,
-                2, 1, 6, 2, 6, 7,
-                7, 6, 4, 7, 4, 5,
-        };
         //Texture texture = new Texture("/textures/grassblock.png");
-        Sphere s = new Sphere(1f);
-        Mesh boxMesh = new Mesh(positions, colours, indices);
+        //load meshes
+        PlaneMesh plane = new PlaneMesh();
+        SphereMesh s = new SphereMesh(1f);
+        BoxMesh box = new BoxMesh();
+        Mesh boxMesh = new Mesh(box.getPositions(), box.getColors(), box.getIndices());
+        Mesh floorMesh = new Mesh(plane.getPositions(), plane.getColors(), plane.getIndices());
         Mesh sphereMesh = new Mesh(s.getVertices(),s.getColors(),s.getIndices());
-        GameItem gameItem1 = new GameItem(boxMesh);
-        gameItem1.setScale(0.5f);
-        gameItem1.setPosition(0, 0, -2);
-        GameItem gameItem2 = new GameItem(sphereMesh);
-        gameItem2.setScale(0.5f);
-        gameItem2.setPosition(0, 0.75f, -2);
-        /*GameItem gameItem3 = new GameItem(boxMesh);
-        gameItem3.setScale(0.5f);
-        gameItem3.setPosition(0, 0, -2.5f);
-        GameItem gameItem4 = new GameItem(boxMesh);
-        gameItem4.setScale(0.5f);
-        gameItem4.setPosition(0.5f, 0, -2.5f);*/
+        //make game item objects
+        GameItem box1 = new GameItem(boxMesh);
+        box1.setScale(0.5f);
+        box1.setPosition(0, 0.75f, -4);
+        GameItem island = new GameItem(sphereMesh);
+        island.setScale(2.0f);
+        island.setPosition(0, -1.5f, -4);
+        island.setRotation(0,0,180f);
+        GameItem sea = new GameItem(floorMesh);
+        sea.setScale(20.0f);
+        sea.setPosition(0, -0.1f, -2.5f);
+        sea.setRotation(90f,0f,0);
 
-        gameItems = new GameItem[]{gameItem1, gameItem2};
+        gameItems = new GameItem[]{sea, island, box1 };
     }
 
     @Override
