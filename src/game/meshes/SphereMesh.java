@@ -1,12 +1,16 @@
 package game.meshes;
 
+import org.joml.GeometryUtils;
+import org.joml.Vector3f;
+
 import java.util.ArrayList;
 
 public class SphereMesh {
 
     private ArrayList<Float> positions = new ArrayList<>();
+    private ArrayList<Float> normals = new ArrayList<>();
+    private ArrayList<Float> texCoords = new ArrayList<>();
     private ArrayList<Integer> indices = new ArrayList<>();
-
 
 
     public SphereMesh(float radius) {
@@ -45,6 +49,8 @@ public class SphereMesh {
                 positions.add(py);
                 positions.add(pz);
 
+
+
                 verticesRow.add(index);
                 index++;
             }
@@ -73,12 +79,62 @@ public class SphereMesh {
                 }
             }
         }
+
+        addNormals();
+
+        addTexCoords();
+
+    }
+
+    private void addNormals(){
+
+        for (int vIdx = 0; vIdx < positions.size(); vIdx += 3){
+            int idx = indices.get(vIdx);
+            Vector3f v1 = new Vector3f(positions.get(idx), positions.get(idx+1), positions.get(idx+2));
+            int idx2 = indices.get(vIdx+1);
+            Vector3f v2 = new Vector3f(positions.get(idx2), positions.get(idx2+1), positions.get(idx2+2));
+            int idx3 = indices.get(vIdx+2);
+            Vector3f v3 = new Vector3f(positions.get(idx3), positions.get(idx3+1), positions.get(idx3+2));
+
+            Vector3f normal = new Vector3f();
+            GeometryUtils.normal(v1,v2,v3,normal);
+
+            normals.add(normal.x);
+            normals.add(normal.y);
+            normals.add(normal.z);
+        }
+    }
+
+    private void addTexCoords(){
+
+        for (int vIdx = 0; vIdx < positions.size(); vIdx += 3){
+            texCoords.add(0.0f);
+            texCoords.add(0.0f);
+        }
     }
 
     public float[] getVertices(){
         float[] floatArray = new float[positions.size()];
         int i = 0;
         for (Float f : positions) {
+            floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+        }
+        return floatArray;
+    }
+
+    public float[] getTexCoords(){
+        float[] floatArray = new float[texCoords.size()];
+        int i = 0;
+        for (Float f : texCoords) {
+            floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+        }
+        return floatArray;
+    }
+
+    public float[] getNormals(){
+        float[] floatArray = new float[normals.size()];
+        int i = 0;
+        for (Float f : normals) {
             floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
         }
         return floatArray;

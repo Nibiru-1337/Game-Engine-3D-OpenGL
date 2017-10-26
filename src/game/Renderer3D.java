@@ -5,6 +5,8 @@ import engine.Utils;
 import engine.Window;
 import engine.graphix.*;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -17,11 +19,14 @@ public class Renderer3D {
     private static final float Z_FAR = 1000.f;
 
     private final Transformation transformation;
-    private GameItem[] gameItems;
     private ShaderProgram program;
+
+    private float specularPower;
+
 
     public Renderer3D() {
         transformation = new Transformation();
+        specularPower = 10f;
     }
 
     public void init(Window window) throws Exception {
@@ -34,16 +39,22 @@ public class Renderer3D {
         // Create uniforms for modelView and projection matrices and texture
         program.createUniform("modelView");
         program.createUniform("projection");
-        // Create uniform for default colour and the flag that controls it
-        program.createUniform("color");
-        program.createUniform("useColor");
+        program.createUniform("texture_sampler");
+        // Create uniform for material
+        program.createMaterialUniform("material");
+        // Create lighting related uniforms
+        program.createUniform("specularPower");
+        program.createUniform("ambientLight");
+        program.createPointLightUniform("pointLight");
     }
+
+
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems) {
+    public void render(Window window, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight) {
         clear();
 
         if ( window.isResized() ) {
@@ -60,15 +71,29 @@ public class Renderer3D {
         // Update view Matrix
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
+        // Update Light Uniforms
+        program.setUniform("ambientLight", ambientLight);
+        program.setUniform("specularPower", specularPower);
+        // Get a copy of the light object and transform its position to view coordinates
+        PointLight currPointLight = new PointLight(pointLight);
+        Vector3f lightPos = currPointLight.getPosition();
+        Vector4f aux = new Vector4f(lightPos, 1);
+        aux.mul(viewMatrix);
+        lightPos.x = aux.x;
+        lightPos.y = aux.y;
+        lightPos.z = aux.z;
+        program.setUniform("pointLight", currPointLight);
+
+        program.setUniform("texture_sampler", 0);
+
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
             Mesh mesh = gameItem.getMesh();
             // Set model view matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             program.setUniform("modelView", modelViewMatrix);
-            // Set its color / texture uniforms
-            program.setUniform("color", mesh.getColor());
-            program.setUniform("useColor", mesh.isTextured() ? 0 : 1);
+            // Render the mesh for this game item
+            program.setUniform("material", mesh.getMaterial());
             // Render the mesh for this game item
             gameItem.getMesh().render();
         }

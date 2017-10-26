@@ -8,6 +8,8 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -16,18 +18,16 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Mesh {
 
-    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
-
     private final VertexArrayObject vao;
-    private final ArrayList<VertexBufferObject> vboList;
+    private ArrayList<VertexBufferObject> vboList;
     private final int vtxCount;
-    private Vector3f color;
+    private Material material;
 
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
-        color = DEFAULT_COLOUR;
         vao = new VertexArrayObject();
         vao.bind();
         vtxCount = indices.length;
+        vboList = null;
         try (MemoryStack stack = MemoryStack.stackPush()) {
             vboList = new ArrayList<>(5);
             // Vertex data
@@ -49,7 +49,7 @@ public class Mesh {
             vboList.add(vboTex);
 
             // Vertex normals VBO
-            FloatBuffer vecNormalsBuffer = stack.mallocFloat(positions.length);
+            FloatBuffer vecNormalsBuffer = stack.mallocFloat(normals.length);
             vecNormalsBuffer.put(normals).flip();
             VertexBufferObject vboNor = new VertexBufferObject();
             vboNor.bind(GL_ARRAY_BUFFER);
@@ -67,10 +67,21 @@ public class Mesh {
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     public void render(){
+        Texture texture = material.getTexture();
+        if (texture != null) {
+            //TODO: implement textures
+            // Activate firs texture bank
+            //glActiveTexture(GL_TEXTURE0);
+            // Bind the texture
+            //glBindTexture(GL_TEXTURE_2D, texture.getId());
+        }
+
         // Draw the mesh
         bind();
         glEnableVertexAttribArray(0);
@@ -94,12 +105,12 @@ public class Mesh {
         //return this.texture != null;
     }
 
-    public void setColour(Vector3f color) {
-        this.color = color;
+    public Material getMaterial() {
+        return material;
     }
 
-    public Vector3f getColor() {
-        return this.color;
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     public int getVaoId() {
@@ -120,8 +131,15 @@ public class Mesh {
         for (VertexBufferObject vbo : vboList) {
             vbo.delete();
         }
+
+        // Delete the texture
+        Texture texture = material.getTexture();
+        if (texture != null) {
+            // TODO: implement
+            //texture.cleanup();
+        }
+
         // Delete the VAO
         vao.delete();
-        // TODO: check if texture is null b4 using
     }
 }
