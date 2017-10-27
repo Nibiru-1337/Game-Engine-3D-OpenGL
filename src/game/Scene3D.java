@@ -62,23 +62,23 @@ public class Scene3D implements IGameLogic {
         GameItem palm1 = new GameItem(palmMesh);
         palm1.setPosition(-0.5f,0,-5);
         palm1.setRotation(0,25f,-10f);
-        palm1.setScale(0.005f);
+        palm1.setScale(new Vector3f(0.005f));
 
         GameItem palm2 = new GameItem(palmMesh);
         palm2.setPosition(0.3f,0,-4);
-        palm2.setScale(0.005f);
+        palm2.setScale(new Vector3f(0.005f));
 
         GameItem box1 = new GameItem(boxMesh);
-        box1.setScale(0.2f);
+        box1.setScale(new Vector3f(0.2f));
         box1.setPosition(0, 0.7f, -5);
 
         GameItem island = new GameItem(sphereMesh);
-        island.setScale(2.0f);
+        island.setScale(new Vector3f(3.0f, 2.0f, 2.0f));
         island.setPosition(0, -1.5f, -5);
         island.setRotation(0,0,180f);
 
         GameItem sea = new GameItem(floorMesh);
-        sea.setScale(20.0f);
+        sea.setScale(new Vector3f(20.0f));
         sea.setPosition(0, -0.1f, -2.5f);
         sea.setRotation(90f,0f,0);
 

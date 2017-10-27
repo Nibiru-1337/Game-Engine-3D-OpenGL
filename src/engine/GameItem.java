@@ -7,13 +7,13 @@ public class GameItem {
 
     private final Mesh mesh;
     private final Vector3f position;
-    private float scale;
+    private Vector3f scale;
     private final Vector3f rotation;
 
     public GameItem(Mesh mesh) {
         this.mesh = mesh;
         position = new Vector3f(0, 0, 0);
-        scale = 1;
+        scale = new Vector3f(1,1,1);
         rotation = new Vector3f(0, 0, 0);
     }
 
@@ -27,11 +27,11 @@ public class GameItem {
         this.position.z = z;
     }
 
-    public float getScale() {
+    public Vector3f getScale() {
         return scale;
     }
 
-    public void setScale(float scale) {
+    public void setScale(Vector3f scale) {
         this.scale = scale;
     }
 
