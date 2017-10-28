@@ -26,12 +26,14 @@ public class Scene3D implements IGameLogic {
     private PointLight pointLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
+    private float lightLamp;
 
     Scene3D(){
         renderer = new Renderer3D();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         lightAngle = -90;
+        lightLamp = 1.0f;
     }
 
 
@@ -45,21 +47,29 @@ public class Scene3D implements IGameLogic {
 
         SphereMesh s = new SphereMesh(1f);
         Mesh sphereMesh = new Mesh(s.getVertices(),s.getTexCoords(), s.getNormals(), s.getIndices());
-        Material sand = new Material(new Vector4f(0.9f, 0.85f, 0.5f,0.5f), reflectance);
+        Material sand = new Material(new Vector4f(0.9f, 0.85f, 0.5f,1f), 0.25f );
         sphereMesh.setMaterial(sand);
 
         PlaneMesh plane = new PlaneMesh();
         Mesh floorMesh = new Mesh(plane.getPositions(), plane.getTexCoords(),plane.getNormals(), plane.getIndices());
-        Material blue = new Material(new Vector4f(0.0f,0.4f,0.6f, 0.5f), reflectance);
+        Material blue = new Material(new Vector4f(0.0f,0.4f,0.6f, 1f), reflectance);
         floorMesh.setMaterial(blue);
 
-        Mesh boxMesh = OBJLoader.loadMesh("src/resources/models/cube.obj");
-        Material wood = new Material(new Vector4f(0.54f, 0.27f, 0.07f, 0.5f), reflectance);
-        boxMesh.setMaterial(wood);
+        //Mesh boxMesh = OBJLoader.loadMesh("src/resources/models/cube.obj");
+        Material wood = new Material(new Vector4f(0.54f, 0.27f, 0.07f, 1f), reflectance);
+        //boxMesh.setMaterial(wood);
 
         Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
-        Material green = new Material(new Vector4f(0.33f, 0.41f, 0.18f, 0.5f), reflectance);
+        Material green = new Material(new Vector4f(0.33f, 0.41f, 0.18f, 1f), reflectance);
         palmMesh.setMaterial(green);
+
+
+        Mesh pierMesh = OBJLoader.loadMesh("src/resources/models/pier.obj");
+        pierMesh.setMaterial(wood);
+
+        Mesh lampMesh = OBJLoader.loadMesh("src/resources/models/streetlamp.obj");
+        Material grey = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), 0.5f);
+        lampMesh.setMaterial(grey);
 
         //make game item objects
         GameItem palm1 = new GameItem(palmMesh);
@@ -71,9 +81,9 @@ public class Scene3D implements IGameLogic {
         palm2.setPosition(0.3f,0,-4);
         palm2.setScale(new Vector3f(0.005f, 0.004f, 0.005f));
 
-        GameItem box1 = new GameItem(boxMesh);
-        box1.setScale(new Vector3f(0.2f));
-        box1.setPosition(0, 0.7f, -5);
+        GameItem lamp = new GameItem(lampMesh);
+        lamp.setScale(new Vector3f(0.15f));
+        lamp.setPosition(0f, 0.4f, -5.0f);
 
         GameItem island = new GameItem(sphereMesh);
         island.setScale(new Vector3f(3.0f, 2.0f, 2.0f));
@@ -85,7 +95,12 @@ public class Scene3D implements IGameLogic {
         sea.setPosition(0, -0.1f, -2.5f);
         sea.setRotation(90f,0f,0);
 
-        gameItems = new GameItem[]{sea, island, box1, palm1, palm2};
+        GameItem pier = new GameItem(pierMesh);
+        pier.setScale(new Vector3f(0.2f));
+        pier.setPosition(-0.4f,0f,-2.8f);
+        pier.setRotation(0,15,0);
+
+        gameItems = new GameItem[]{sea, island, lamp, palm1, palm2, pier};
 
         setUpLight();
     }
@@ -111,9 +126,13 @@ public class Scene3D implements IGameLogic {
         }
         float lightPos = pointLight.getPosition().z;
         if (window.isKeyPressed(GLFW_KEY_N)) {
-            this.pointLight.getPosition().z = lightPos + 0.1f;
+            lightAngle += 1.1f;
+            //this.pointLight.getPosition().z = lightPos + 0.1f;
         } else if (window.isKeyPressed(GLFW_KEY_M)) {
-            this.pointLight.getPosition().z = lightPos - 0.1f;
+            if (lightLamp > 0.9f)
+                lightLamp = 0.0f;
+            lightLamp += 0.01f;
+            //this.pointLight.getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -130,8 +149,12 @@ public class Scene3D implements IGameLogic {
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
 
+        // Update lamp light color
+
+        pointLight.setColor(new Vector3f(1f, lightLamp, 0.4f));
+
         // Update directional light direction, intensity and colour
-        lightAngle += 1.1f;
+        //lightAngle += 1.1f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
             if (lightAngle >= 360) {
@@ -169,17 +192,16 @@ public class Scene3D implements IGameLogic {
 
     private void setUpLight() {
         // Ambient light
-        ambientLight = new Vector3f(1.0f, 1.0f, 1.0f);
+        ambientLight = new Vector3f(0.8f, 0.8f, 0.8f);
         // Point light
-        Vector3f lightColour = new Vector3f(1, 1, 1);
-        Vector3f lightPosition = new Vector3f(0, 3, -5);
-        float lightIntensity = 1.0f;
-        pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
+        Vector3f lightColour = new Vector3f(1f, lightLamp, 0.4f);
+        Vector3f lightPosition = new Vector3f(0, 1.15f, -5f);
+        pointLight = new PointLight(lightColour, lightPosition, 1.0f);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
         // Directional light
         lightPosition = new Vector3f(-1, 0, 0);
         lightColour = new Vector3f(1, 1, 1);
-        directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
+        directionalLight = new DirectionalLight(lightColour, lightPosition, 0.25f);
     }
 }
