@@ -33,6 +33,12 @@ public class ShaderProgram {
         uniforms = new HashMap<>();
     }
 
+    public void createDirectionalLightUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".direction");
+        createUniform(uniformName + ".intensity");
+    }
+
     public void createPointLightUniform(String uniformName) throws Exception {
         createUniform(uniformName + ".colour");
         createUniform(uniformName + ".position");
@@ -56,6 +62,12 @@ public class ShaderProgram {
             throw new Exception("Could not find uniform:" + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
+    }
+
+    public void setUniform(String uniformName, DirectionalLight dirLight) {
+        setUniform(uniformName + ".colour", dirLight.getColor());
+        setUniform(uniformName + ".direction", dirLight.getDirection());
+        setUniform(uniformName + ".intensity", dirLight.getIntensity());
     }
 
     public void setUniform(String uniformName, PointLight pointLight) {
