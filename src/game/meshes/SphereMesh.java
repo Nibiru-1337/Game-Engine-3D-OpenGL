@@ -89,16 +89,9 @@ public class SphereMesh {
     private void addNormals(){
 
         for (int vIdx = 0; vIdx < positions.size(); vIdx += 3){
-            int idx = indices.get(vIdx);
-            Vector3f v1 = new Vector3f(positions.get(idx), positions.get(idx+1), positions.get(idx+2));
-            int idx2 = indices.get(vIdx+1);
-            Vector3f v2 = new Vector3f(positions.get(idx2), positions.get(idx2+1), positions.get(idx2+2));
-            int idx3 = indices.get(vIdx+2);
-            Vector3f v3 = new Vector3f(positions.get(idx3), positions.get(idx3+1), positions.get(idx3+2));
+            Vector3f v1 = new Vector3f(positions.get(vIdx), positions.get(vIdx+1), positions.get(vIdx+2));
 
-            Vector3f normal = new Vector3f();
-            GeometryUtils.normal(v1,v2,v3,normal);
-
+            Vector3f normal = new Vector3f(v1).normalize();
             normals.add(normal.x);
             normals.add(normal.y);
             normals.add(normal.z);

@@ -150,11 +150,9 @@ public class Scene3D implements IGameLogic {
         }
 
         // Update lamp light color
-
         pointLight.setColor(new Vector3f(1f, lightLamp, 0.4f));
 
         // Update directional light direction, intensity and colour
-        //lightAngle += 1.1f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
             if (lightAngle >= 360) {
@@ -201,7 +199,7 @@ public class Scene3D implements IGameLogic {
         pointLight.setAttenuation(att);
         // Directional light
         lightPosition = new Vector3f(-1, 0, 0);
-        lightColour = new Vector3f(1, 1, 1);
+        lightColour = new Vector3f(1f, 1f, 1f);
         directionalLight = new DirectionalLight(lightColour, lightPosition, 0.25f);
     }
 }
