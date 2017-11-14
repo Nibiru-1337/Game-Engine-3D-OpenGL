@@ -57,7 +57,7 @@ public class Scene3D implements IGameLogic {
         floorMesh.setMaterial(blue);
 
         Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
-        Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex.png"));
+        Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex2.png"));
         palmMesh.setMaterial(palmMaterial);
 
         Mesh pierMesh = OBJLoader.loadMesh("src/resources/models/pier.obj");
@@ -65,8 +65,8 @@ public class Scene3D implements IGameLogic {
         pierMesh.setMaterial(pierMaterial);
 
         Mesh lampMesh = OBJLoader.loadMesh("src/resources/models/streetlamp.obj");
-        Material grey = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), 0.5f);
-        lampMesh.setMaterial(grey);
+        Material lampMaterial = new Material(new Texture("src/resources/models/streetlamp-tex.png"));
+        lampMesh.setMaterial(lampMaterial);
 
         //make game item objects
         GameItem palm1 = new GameItem(palmMesh);
