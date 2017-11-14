@@ -52,6 +52,7 @@ public class Renderer3D {
 
 
     public void clear() {
+        //glClearColor(0.38f,0.14f,0.10f, 0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 

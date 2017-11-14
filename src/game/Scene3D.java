@@ -11,6 +11,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import javax.xml.soap.Text;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Scene3D implements IGameLogic {
@@ -36,7 +38,6 @@ public class Scene3D implements IGameLogic {
         lightLamp = 1.0f;
     }
 
-
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
@@ -55,17 +56,13 @@ public class Scene3D implements IGameLogic {
         Material blue = new Material(new Vector4f(0.0f,0.4f,0.6f, 1f), reflectance);
         floorMesh.setMaterial(blue);
 
-        //Mesh boxMesh = OBJLoader.loadMesh("src/resources/models/cube.obj");
-        Material wood = new Material(new Vector4f(0.54f, 0.27f, 0.07f, 1f), reflectance);
-        //boxMesh.setMaterial(wood);
-
         Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
-        Material green = new Material(new Vector4f(0.33f, 0.41f, 0.18f, 1f), reflectance);
-        palmMesh.setMaterial(green);
-
+        Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex.png"));
+        palmMesh.setMaterial(palmMaterial);
 
         Mesh pierMesh = OBJLoader.loadMesh("src/resources/models/pier.obj");
-        pierMesh.setMaterial(wood);
+        Material pierMaterial = new Material(new Texture("src/resources/models/pier-tex.png"));
+        pierMesh.setMaterial(pierMaterial);
 
         Mesh lampMesh = OBJLoader.loadMesh("src/resources/models/streetlamp.obj");
         Material grey = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), 0.5f);

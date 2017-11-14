@@ -75,11 +75,10 @@ public class Mesh {
     public void render(){
         Texture texture = material.getTexture();
         if (texture != null) {
-            //TODO: implement textures
-            // Activate firs texture bank
-            //glActiveTexture(GL_TEXTURE0);
+            //Activate firs texture bank
+            glActiveTexture(GL_TEXTURE0);
             // Bind the texture
-            //glBindTexture(GL_TEXTURE_2D, texture.getId());
+            glBindTexture(GL_TEXTURE_2D, texture.getId());
         }
 
         // Draw the mesh
@@ -96,13 +95,6 @@ public class Mesh {
         glDisableVertexAttribArray(2);
         glBindVertexArray(0);
 
-        // TODO: check if texture is null b4 using
-        //glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-    public boolean isTextured() {
-        return false;
-        //return this.texture != null;
     }
 
     public Material getMaterial() {
@@ -135,8 +127,7 @@ public class Mesh {
         // Delete the texture
         Texture texture = material.getTexture();
         if (texture != null) {
-            // TODO: implement
-            //texture.cleanup();
+            texture.cleanup();
         }
 
         // Delete the VAO
