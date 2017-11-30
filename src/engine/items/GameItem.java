@@ -1,20 +1,24 @@
-package engine;
+package engine.items;
 
 import engine.graphix.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem {
 
-    private final Mesh mesh;
+    private Mesh mesh;
     private final Vector3f position;
     private Vector3f scale;
     private final Vector3f rotation;
 
-    public GameItem(Mesh mesh) {
-        this.mesh = mesh;
+    public GameItem() {
         position = new Vector3f(0, 0, 0);
         scale = new Vector3f(1,1,1);
         rotation = new Vector3f(0, 0, 0);
+    }
+
+    public GameItem(Mesh mesh) {
+        this();
+        this.mesh = mesh;
     }
 
     public Vector3f getPosition() {
@@ -29,6 +33,10 @@ public class GameItem {
 
     public Vector3f getScale() {
         return scale;
+    }
+
+    public  void setScale(float scale){
+        this.scale = new Vector3f(scale,scale,scale);
     }
 
     public void setScale(Vector3f scale) {
@@ -47,5 +55,9 @@ public class GameItem {
 
     public Mesh getMesh() {
         return mesh;
+    }
+
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
     }
 }

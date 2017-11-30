@@ -1,19 +1,20 @@
 package game;
 
-import engine.GameItem;
-import engine.IGameLogic;
-import engine.MouseInput;
+import engine.*;
 import engine.Window;
 import engine.graphix.*;
+import engine.items.GameItem;
 import game.meshes.PlaneMesh;
 import game.meshes.SphereMesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import javax.xml.soap.Text;
+import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 
 public class Scene3D implements IGameLogic {
 
@@ -21,12 +22,10 @@ public class Scene3D implements IGameLogic {
     private final Vector3f cameraInc;
     private final Renderer3D renderer;
     private final Camera camera;
-    private GameItem[] gameItems;
+    private Scene scene;
+    private Hud hud = null;
     private static final float CAMERA_POS_STEP = 0.05f;
 
-    private Vector3f ambientLight;
-    private PointLight pointLight;
-    private DirectionalLight directionalLight;
     private float lightAngle;
     private float lightLamp;
 
@@ -34,7 +33,7 @@ public class Scene3D implements IGameLogic {
         renderer = new Renderer3D();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
-        lightAngle = -90;
+        lightAngle = 0;
         lightLamp = 1.0f;
     }
 
@@ -42,10 +41,11 @@ public class Scene3D implements IGameLogic {
     public void init(Window window) throws Exception {
         renderer.init(window);
 
-        float reflectance = 1f;
-        //Texture texture = new Texture("/textures/grassblock.png");
-        //load meshes
+        scene = new Scene();
 
+        float reflectance = 1f;
+
+        //load meshes and create game items
         SphereMesh s = new SphereMesh(1f);
         Mesh sphereMesh = new Mesh(s.getVertices(),s.getTexCoords(), s.getNormals(), s.getIndices());
         Material sand = new Material(new Vector4f(0.9f, 0.85f, 0.5f,1f), 0.25f );
@@ -97,13 +97,19 @@ public class Scene3D implements IGameLogic {
         pier.setPosition(-0.4f,0f,-2.8f);
         pier.setRotation(0,15,0);
 
-        gameItems = new GameItem[]{sea, island, lamp, palm1, palm2, pier};
+        GameItem[] gameItems = new GameItem[]{sea, island, lamp, palm1, palm2, pier};
+        //scene.setGameItems(gameItems);
+
+        // Setup  SkyBox
+        SkyBox skyBox = new SkyBox("src/resources/skybox/skybox.obj", "src/resources/skybox/skybox.png");
+        skyBox.setScale(50f);
+        scene.setSkyBox(skyBox);
 
         setUpLight();
     }
 
     @Override
-    public void input(Window window, MouseInput mouseInput) {
+    public void input(Window window, MouseInput mouseInput) throws Exception {
         cameraInc.set(0, 0, 0);
         if (window.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -1;
@@ -121,16 +127,48 @@ public class Scene3D implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             cameraInc.y = 1;
         }
-        float lightPos = pointLight.getPosition().z;
         if (window.isKeyPressed(GLFW_KEY_N)) {
-            lightAngle += 1.1f;
-            //this.pointLight.getPosition().z = lightPos + 0.1f;
+            lightAngle += 1.0f;
         } else if (window.isKeyPressed(GLFW_KEY_M)) {
             if (lightLamp > 0.9f)
                 lightLamp = 0.0f;
             lightLamp += 0.01f;
-            //this.pointLight.getPosition().z = lightPos - 0.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_8)){
+            // MSAA
+            GameSettings.toggleMSAA();
+            if (GameSettings.isMSAA()){
+
+            } else{
+
+            }
+        } else if (window.isKeyPressed(GLFW_KEY_9)) {
+            // Magnification Filtering
+            GameSettings.toggleMagLinear();
+            if (GameSettings.isMagLinear()) {
+                setTexParam(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            } else{
+                setTexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            }
+        } else if (window.isKeyPressed(GLFW_KEY_0)){
+            // Trilinear Filtering
+            GameSettings.toggleMinTrilinear();
+            if(GameSettings.isMinTrilinear()) {
+                setTexParam(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            } else {
+                setTexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+            }
+        } else if (window.isKeyPressed(GLFW_KEY_1)){
+            setTexParam(GL_TEXTURE_LOD_BIAS, -5);
+        } else if (window.isKeyPressed(GLFW_KEY_2)){
+            setTexParam(GL_TEXTURE_LOD_BIAS, 0);
+        } else if (window.isKeyPressed(GLFW_KEY_3)){
+            setTexParam(GL_TEXTURE_LOD_BIAS, 2);
         }
+    }
+
+    private void setTexParam(int pname, int param) throws Exception {
+        // https://www.khronos.org/opengl/wiki/GLAPI/glTexParameter
+        scene.setTexParam(pname, param);
     }
 
     @Override
@@ -146,21 +184,26 @@ public class Scene3D implements IGameLogic {
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
 
+        SceneLight sceneLight = scene.getSceneLight();
         // Update lamp light color
-        pointLight.setColor(new Vector3f(1f, lightLamp, 0.4f));
-
+        sceneLight.getPointLightList()[0].setColor(new Vector3f(1f, lightLamp, 0.4f));
         // Update directional light direction, intensity and colour
+        DirectionalLight directionalLight = sceneLight.getDirectionalLight();
+        //lightAngle += 0.5f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
             if (lightAngle >= 360) {
                 lightAngle = -90;
             }
+            sceneLight.getSkyBoxLight().set(0.3f, 0.3f, 0.3f);
         } else if (lightAngle <= -80 || lightAngle >= 80) {
             float factor = 1 - (float) (Math.abs(lightAngle) - 80) / 10.0f;
+            sceneLight.getSkyBoxLight().set(factor, factor, factor);
             directionalLight.setIntensity(factor);
             directionalLight.getColor().y = Math.max(factor, 0.9f);
             directionalLight.getColor().z = Math.max(factor, 0.5f);
         } else {
+            sceneLight.getSkyBoxLight().set(1.0f, 1.0f, 1.0f);
             directionalLight.setIntensity(1);
             directionalLight.getColor().x = 1;
             directionalLight.getColor().y = 1;
@@ -174,29 +217,35 @@ public class Scene3D implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameItems, ambientLight, pointLight, directionalLight);
+        renderer.render(window, camera, scene);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameItem gameItem : gameItems) {
-            gameItem.getMesh().delete();
+        scene.cleanup();
+        if (hud != null) {
+            hud.cleanup();
         }
     }
 
     private void setUpLight() {
+        SceneLight sceneLight = new SceneLight();
+        scene.setSceneLight(sceneLight);
         // Ambient light
-        ambientLight = new Vector3f(0.8f, 0.8f, 0.8f);
+        sceneLight.setAmbientLight(new Vector3f(0.8f, 0.8f, 0.8f));
+        sceneLight.setSkyBoxLight(new Vector3f(1.0f, 1.0f, 1.0f));
         // Point light
         Vector3f lightColour = new Vector3f(1f, lightLamp, 0.4f);
         Vector3f lightPosition = new Vector3f(0, 1.15f, -5f);
-        pointLight = new PointLight(lightColour, lightPosition, 1.0f);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
-        pointLight.setAttenuation(att);
+        PointLight pl = new PointLight(lightColour, lightPosition, 1.0f);
+        pl.setAttenuation(att);
+        PointLight[] plArr = new PointLight[]{pl};
+        sceneLight.setPointLightList(plArr);
         // Directional light
         lightPosition = new Vector3f(-1, 0, 0);
         lightColour = new Vector3f(1f, 1f, 1f);
-        directionalLight = new DirectionalLight(lightColour, lightPosition, 0.25f);
+        sceneLight.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, 0.25f));
     }
 }
