@@ -43,8 +43,6 @@ public class Scene3D implements IGameLogic {
 
         scene = new Scene();
 
-        float reflectance = 1f;
-
         //load meshes and create game items
         SphereMesh s = new SphereMesh(1f);
         Mesh sphereMesh = new Mesh(s.getVertices(),s.getTexCoords(), s.getNormals(), s.getIndices());
@@ -58,7 +56,7 @@ public class Scene3D implements IGameLogic {
         floorMesh.setMaterial(seaMaterial);
 
         Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
-        Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex2.png"));
+        Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex3.png"));
         palmMesh.setMaterial(palmMaterial);
 
         Mesh pierMesh = OBJLoader.loadMesh("src/resources/models/pier.obj");
@@ -89,7 +87,7 @@ public class Scene3D implements IGameLogic {
         island.setRotation(0,0,180f);
 
         GameItem sea = new GameItem(floorMesh);
-        sea.setScale(new Vector3f(30.0f));
+        sea.setScale(new Vector3f(10.0f));
         sea.setPosition(0, -0.1f, -2.5f);
         sea.setRotation(90f,0f,0);
 
@@ -98,13 +96,13 @@ public class Scene3D implements IGameLogic {
         pier.setPosition(-0.4f,0f,-2.8f);
         pier.setRotation(0,15,0);
 
-        GameItem[] gameItems = new GameItem[]{sea, island, lamp, palm1, palm2, pier};
+        GameItem[] gameItems = new GameItem[]{island, sea, lamp, pier, palm1, palm2};
         //GameItem[] gameItems = new GameItem[]{island, lamp, palm1, palm2, pier};
         scene.setGameItems(gameItems);
 
         // Setup  SkyBox
-        SkyBox skyBox = new SkyBox("src/resources/skybox/skybox.obj", "src/resources/skybox/skybox.png");
-        skyBox.setScale(10f);
+        SkyBox skyBox = new SkyBox("src/resources/skybox/skybox.obj", "src/resources/skybox/skybox2.png");
+        skyBox.setScale(8f);
         scene.setSkyBox(skyBox);
 
         setUpLight();

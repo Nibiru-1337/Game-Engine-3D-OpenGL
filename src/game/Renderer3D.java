@@ -84,9 +84,9 @@ public class Renderer3D {
         transformation.updateProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         transformation.updateViewMatrix(camera);
 
+        renderSkyBox(window, camera, scene);
         renderScene(window, camera, scene);
 
-        renderSkyBox(window, camera, scene);
 
     }
 
@@ -125,6 +125,9 @@ public class Renderer3D {
         skyBoxShaderProgram.setUniform("projectionMatrix", projectionMatrix);
         SkyBox skyBox = scene.getSkyBox();
         Matrix4f viewMatrix = transformation.getViewMatrix();
+        float tmp1 = viewMatrix.m30();
+        float tmp2 = viewMatrix.m31();
+        float tmp3 = viewMatrix.m32();
         viewMatrix.m30(0);
         viewMatrix.m31(0);
         viewMatrix.m32(0);
@@ -135,6 +138,10 @@ public class Renderer3D {
         scene.getSkyBox().getMesh().render();
 
         skyBoxShaderProgram.unbind();
+
+        viewMatrix.m30(tmp1);
+        viewMatrix.m31(tmp2);
+        viewMatrix.m32(tmp3);
     }
 
     private void renderLights(Matrix4f viewMatrix, SceneLight sceneLight) {
