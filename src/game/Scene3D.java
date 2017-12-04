@@ -106,6 +106,8 @@ public class Scene3D implements IGameLogic {
         scene.setSkyBox(skyBox);
 
         setUpLight();
+
+        scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.25f));
     }
 
     @Override

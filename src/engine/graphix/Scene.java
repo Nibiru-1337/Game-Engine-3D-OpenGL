@@ -12,9 +12,11 @@ public class Scene {
     private Map<Mesh, List<GameItem>> meshMap;
     private SkyBox skyBox;
     private SceneLight sceneLight;
+    private Fog fog;
 
     public Scene() {
         meshMap = new HashMap();
+        fog = Fog.NOFOG;
     }
 
     public Map<Mesh, List<GameItem>> getGameMeshes() {
@@ -58,6 +60,14 @@ public class Scene {
 
     public void setSceneLight(SceneLight sceneLight) {
         this.sceneLight = sceneLight;
+    }
+
+    public Fog getFog() {
+        return fog;
+    }
+
+    public void setFog(Fog fog) {
+        this.fog = fog;
     }
 
     public void cleanup() {
