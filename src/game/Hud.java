@@ -31,11 +31,11 @@ public class Hud {
     public int hudWidth = 350;
 
     // button vars
-    private String fogTxt = GameSettings.isFOG()? "Fog - ON" : "Fog - OFF";
-    private String linMagTxt = GameSettings.isMagLinear()? "Linear magnification filter - ON" : "Linear magnification filter - OFF";
-    private String triMinTxt = GameSettings.isMinTrilinear()? "Trilinear mipmap filtering - ON": "Trilinear mipmap filtering - OFF";
-    private String lodTxt = "Level of details bias: " + GameSettings.getLodBias();
-    private String MSAATxt = GameSettings.isMSAA()? "AntiAliasing (MSAA) - ON" : "AntiAliasing (MSAA) - OFF";
+    private String fogTxt;
+    private String linMagTxt;
+    private String triMinTxt;
+    private String lodTxt;
+    private String MSAATxt;
     private boolean[] hover;
 
     public void init() throws Exception {
@@ -188,8 +188,8 @@ public class Hud {
 
     private void updateSettings(){
         fogTxt = GameSettings.isFOG()? "Fog - ON" : "Fog - OFF";
-        linMagTxt = GameSettings.isMagLinear()? "Linear magnification filter - ON" : "Linear magnification filter - OFF";
-        triMinTxt = GameSettings.isMinTrilinear()? "Trilinear mipmap filtering - ON": "Trilinear mipmap filtering - OFF";
+        linMagTxt = GameSettings.isMagLinear()? "Linear Mag filter - ON" : "Linear Mag filter - OFF";
+        triMinTxt = GameSettings.isMinTrilinear()? "Trilinear Min filtering - ON": "Trilinear Min filtering - OFF";
         lodTxt = "Level of details bias: " + GameSettings.getLodBias();
         MSAATxt = GameSettings.isMSAA()? "AntiAliasing (MSAA) - ON" : "AntiAliasing (MSAA) - OFF";
     }

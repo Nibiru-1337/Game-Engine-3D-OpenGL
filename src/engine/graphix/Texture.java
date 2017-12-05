@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.GL_TEXTURE_FILTER_CONTROL;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class Texture {
@@ -42,10 +43,6 @@ public class Texture {
         // Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
         // Upload the texture data
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
         // Generate Mip Map
@@ -57,7 +54,6 @@ public class Texture {
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         bind();
         glTexParameteri(GL_TEXTURE_2D, pname, param);
-        glGenerateMipmap(GL_TEXTURE_2D);
     }
 
     public int getWidth() {

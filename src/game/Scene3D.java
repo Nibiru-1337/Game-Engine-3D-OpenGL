@@ -195,8 +195,8 @@ public class Scene3D implements IGameLogic {
                                 if (bias == -5)
                                     GameSettings.setLodBias(0);
                                 else if (bias == 0)
-                                    GameSettings.setLodBias(2);
-                                else if (bias == 2)
+                                    GameSettings.setLodBias(1);
+                                else if (bias == 1)
                                     GameSettings.setLodBias(-5);
                                 setTexParam(GL_TEXTURE_LOD_BIAS, GameSettings.getLodBias());
                                 break;
