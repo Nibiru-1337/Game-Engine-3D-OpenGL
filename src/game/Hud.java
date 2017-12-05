@@ -28,8 +28,18 @@ public class Hud {
     private DoubleBuffer posx;
     private DoubleBuffer posy;
     private int counter;
+    public int hudWidth = 350;
+
+    // button vars
+    private String fogTxt = GameSettings.isFOG()? "Fog - ON" : "Fog - OFF";
+    private String linMagTxt = GameSettings.isMagLinear()? "Linear magnification filter - ON" : "Linear magnification filter - OFF";
+    private String triMinTxt = GameSettings.isMinTrilinear()? "Trilinear mipmap filtering - ON": "Trilinear mipmap filtering - OFF";
+    private String lodTxt = "Level of details bias: " + GameSettings.getLodBias();
+    private String MSAATxt = GameSettings.isMSAA()? "AntiAliasing (MSAA) - ON" : "AntiAliasing (MSAA) - OFF";
+    private boolean[] hover;
 
     public void init() throws Exception {
+
         this.vg = GameSettings.isMSAA() ? nvgCreate(NVG_ANTIALIAS | NVG_STENCIL_STROKES) : nvgCreate(NVG_STENCIL_STROKES);
         if (this.vg == NULL) {
             throw new Exception("Could not init nanovg");
@@ -46,11 +56,86 @@ public class Hud {
         posy = BufferUtils.createDoubleBuffer(1);
 
         counter = 0;
+
+        hover = new boolean[] {false, false, false, false, false};
     }
 
     public void render(Window window) {
+        updateSettings();
         nvgBeginFrame(vg, window.getWidth(), window.getHeight(), 1);
 
+        //stubHud(window);
+        drawHud(window);
+
+        nvgEndFrame(vg);
+
+        // Restore state
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    private void drawHud(Window window){
+        int y_offset = 30;
+        int y_pos = 15;
+
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg,10, 10, hudWidth, 165, 20);
+        nvgFillColor(vg, rgba(0x0, 0x0, 0x0, 200, colour));
+        nvgFill(vg);
+
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[0])
+            nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, fogTxt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[1])
+            nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, linMagTxt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[2])
+            nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, triMinTxt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[3])
+            nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, lodTxt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[4])
+            nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos,MSAATxt);
+
+    }
+
+    private void stubHud(Window window){
         // Upper ribbon
         nvgBeginPath(vg);
         nvgRect(vg, 0, window.getHeight() - 100, window.getWidth(), 50);
@@ -95,13 +180,18 @@ public class Hud {
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
         nvgFillColor(vg, rgba(0xe6, 0xea, 0xed, 255, colour));
         nvgText(vg, window.getWidth() - 150, window.getHeight() - 95, dateFormat.format(new Date()));
+    }
 
-        nvgEndFrame(vg);
+    public void hover(int i, boolean val){
+        hover[i] = val;
+    }
 
-        // Restore state
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_STENCIL_TEST);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    private void updateSettings(){
+        fogTxt = GameSettings.isFOG()? "Fog - ON" : "Fog - OFF";
+        linMagTxt = GameSettings.isMagLinear()? "Linear magnification filter - ON" : "Linear magnification filter - OFF";
+        triMinTxt = GameSettings.isMinTrilinear()? "Trilinear mipmap filtering - ON": "Trilinear mipmap filtering - OFF";
+        lodTxt = "Level of details bias: " + GameSettings.getLodBias();
+        MSAATxt = GameSettings.isMSAA()? "AntiAliasing (MSAA) - ON" : "AntiAliasing (MSAA) - OFF";
     }
 
     public void incCounter() {

@@ -55,6 +55,7 @@ public class Texture {
     public void setTexParam(int pname, int param){
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        bind();
         glTexParameteri(GL_TEXTURE_2D, pname, param);
         glGenerateMipmap(GL_TEXTURE_2D);
     }

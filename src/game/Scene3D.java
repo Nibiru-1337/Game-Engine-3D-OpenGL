@@ -9,8 +9,9 @@ import game.meshes.SphereMesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 
-import java.awt.*;
+import java.nio.DoubleBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -29,6 +30,9 @@ public class Scene3D implements IGameLogic {
     private float lightAngle;
     private float lightLamp;
 
+    private boolean rightMouse;
+    private DoubleBuffer posx;
+    private DoubleBuffer posy;
     Scene3D(){
         renderer = new Renderer3D();
         hud = new Hud();
@@ -36,6 +40,7 @@ public class Scene3D implements IGameLogic {
         cameraInc = new Vector3f(0, 0, 0);
         lightAngle = 0;
         lightLamp = 1.0f;
+        rightMouse = false;
     }
 
     @Override
@@ -109,6 +114,9 @@ public class Scene3D implements IGameLogic {
         setUpLight();
 
         scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.25f));
+
+        posx = BufferUtils.createDoubleBuffer(1);
+        posy = BufferUtils.createDoubleBuffer(1);
     }
 
     @Override
@@ -136,42 +144,72 @@ public class Scene3D implements IGameLogic {
             if (lightLamp > 0.9f)
                 lightLamp = 0.0f;
             lightLamp += 0.01f;
-        } else if (window.isKeyPressed(GLFW_KEY_8)){
-            // MSAA
-            GameSettings.toggleMSAA();
-            if (GameSettings.isMSAA()){
-
-            } else{
-
-            }
-        } else if (window.isKeyPressed(GLFW_KEY_9)) {
-            // Magnification Filtering
-            GameSettings.toggleMagLinear();
-            if (GameSettings.isMagLinear()) {
-                setTexParam(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            } else{
-                setTexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            }
-        } else if (window.isKeyPressed(GLFW_KEY_0)){
-            // Trilinear Filtering
-            GameSettings.toggleMinTrilinear();
-            if(GameSettings.isMinTrilinear()) {
-                setTexParam(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            } else {
-                setTexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-            }
-        } else if (window.isKeyPressed(GLFW_KEY_1)){
-            setTexParam(GL_TEXTURE_LOD_BIAS, -5);
-        } else if (window.isKeyPressed(GLFW_KEY_2)){
-            setTexParam(GL_TEXTURE_LOD_BIAS, 0);
-        } else if (window.isKeyPressed(GLFW_KEY_3)){
-            setTexParam(GL_TEXTURE_LOD_BIAS, 2);
         }
 
+        // HUD mouse interaction
+        glfwGetCursorPos(window.getWindowHandle(), posx, posy);
+        boolean pressed = mouseInput.isRightButtonPressed();
+        int x = (int) posx.get(0);
+        int y = (int) posy.get(0);
 
-        boolean aux = mouseInput.isLeftButtonPressed();
-        if (aux) {
-            this.hud.incCounter();
+        if (!rightMouse && pressed) {
+            rightMouse = pressed;
+            // mouse click detected
+            reactToMouse(x, y, true);
+        } else
+            reactToMouse(x,y, false);
+        if (rightMouse && !pressed){
+            rightMouse = pressed;
+        }
+    }
+
+    public void reactToMouse(int x, int y, boolean click) throws Exception {
+        if (15 < x && x < hud.hudWidth) {
+            int lb = 15, ub = 45;
+            for (int i=0; i < 5; i++) {
+                if (lb < y && y < ub) {
+                    hud.hover(i, true);
+                    if (click) {
+                        switch (i) {
+                            case 0:
+                                GameSettings.toggleFog();
+                                break;
+                            case 1:
+                                GameSettings.toggleMagLinear();
+                                if (GameSettings.isMagLinear()) {
+                                    setTexParam(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                                } else{
+                                    setTexParam(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                                }
+                                break;
+                            case 2:
+                                GameSettings.toggleMinTrilinear();
+                                if(GameSettings.isMinTrilinear()) {
+                                    setTexParam(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                                } else {
+                                    setTexParam(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+                                }
+                                break;
+                            case 3:
+                                int bias = GameSettings.getLodBias();
+                                if (bias == -5)
+                                    GameSettings.setLodBias(0);
+                                else if (bias == 0)
+                                    GameSettings.setLodBias(2);
+                                else if (bias == 2)
+                                    GameSettings.setLodBias(-5);
+                                setTexParam(GL_TEXTURE_LOD_BIAS, GameSettings.getLodBias());
+                                break;
+                            case 4:
+                                GameSettings.toggleMSAA();
+                                break;
+                        }
+                    }
+                } else
+                    hud.hover(i, false);
+                lb += 30;
+                ub += 30;
+            }
         }
     }
 

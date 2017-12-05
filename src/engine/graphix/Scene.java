@@ -1,5 +1,6 @@
 package engine.graphix;
 
+import engine.GameSettings;
 import engine.items.GameItem;
 
 import java.util.ArrayList;
@@ -63,7 +64,10 @@ public class Scene {
     }
 
     public Fog getFog() {
-        return fog;
+        if (GameSettings.isFOG())
+            return fog;
+        else
+            return Fog.NOFOG;
     }
 
     public void setFog(Fog fog) {
