@@ -31,6 +31,7 @@ public class Scene3D implements IGameLogic {
 
     Scene3D(){
         renderer = new Renderer3D();
+        hud = new Hud();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         lightAngle = 0;
@@ -39,6 +40,7 @@ public class Scene3D implements IGameLogic {
 
     @Override
     public void init(Window window) throws Exception {
+        hud.init();
         renderer.init(window);
 
         scene = new Scene();
@@ -96,8 +98,7 @@ public class Scene3D implements IGameLogic {
         pier.setPosition(-0.4f,0f,-2.8f);
         pier.setRotation(0,15,0);
 
-        GameItem[] gameItems = new GameItem[]{island, sea, lamp, pier, palm1, palm2};
-        //GameItem[] gameItems = new GameItem[]{island, lamp, palm1, palm2, pier};
+        GameItem[] gameItems = new GameItem[]{sea, island, lamp, pier, palm1, palm2};
         scene.setGameItems(gameItems);
 
         // Setup  SkyBox
@@ -166,6 +167,12 @@ public class Scene3D implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_3)){
             setTexParam(GL_TEXTURE_LOD_BIAS, 2);
         }
+
+
+        boolean aux = mouseInput.isLeftButtonPressed();
+        if (aux) {
+            this.hud.incCounter();
+        }
     }
 
     private void setTexParam(int pname, int param) throws Exception {
@@ -220,6 +227,7 @@ public class Scene3D implements IGameLogic {
     @Override
     public void render(Window window) {
         renderer.render(window, camera, scene);
+        hud.render(window);
     }
 
     @Override

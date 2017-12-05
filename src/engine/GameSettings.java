@@ -5,7 +5,7 @@ public final class GameSettings {
     private static boolean MAG_LINEAR = false;
     private static boolean MIN_TRILINEAR = false;
     private static int LOD_BIAS = 0;
-    private static boolean MSAA = false;
+    private static boolean MSAA = true;
 
     private GameSettings(){}
 

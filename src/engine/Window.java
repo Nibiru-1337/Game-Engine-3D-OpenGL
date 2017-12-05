@@ -95,6 +95,11 @@ public class Window {
         // Support for transparencies
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // Suport for stensil cutouts and antialiasing
+        glEnable(GL_STENCIL_TEST);
+        if (GameSettings.isMSAA())
+            glfwWindowHint(GLFW_SAMPLES, 4);
     }
 
     public long getWindowHandle() {
