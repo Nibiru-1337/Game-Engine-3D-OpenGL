@@ -5,19 +5,15 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private final String title;
-
     private int width;
-
     private int height;
-
     private long windowHandle;
-
     private boolean resized;
-
     private boolean vSync;
 
     public Window(String title, int width, int height, boolean vSync) {
@@ -98,8 +94,10 @@ public class Window {
 
         // Suport for stensil cutouts and antialiasing
         glEnable(GL_STENCIL_TEST);
-        if (GameSettings.isMSAA())
+        if (GameSettings.isMSAA()) {
             glfwWindowHint(GLFW_SAMPLES, 4);
+            glEnable(GL_MULTISAMPLE);
+        }
     }
 
     public long getWindowHandle() {

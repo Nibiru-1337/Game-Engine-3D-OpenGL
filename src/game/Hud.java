@@ -36,6 +36,9 @@ public class Hud {
     private String triMinTxt;
     private String lodTxt;
     private String MSAATxt;
+    private String RES1Txt = "1920 x 1080";
+    private String RES2Txt = "1600 x 900";
+    private String RES3Txt = "1290 x 1024";
     private boolean[] hover;
 
     public void init() throws Exception {
@@ -57,7 +60,7 @@ public class Hud {
 
         counter = 0;
 
-        hover = new boolean[] {false, false, false, false, false};
+        hover = new boolean[] {false, false, false, false, false, false, false, false};
     }
 
     public void render(Window window) {
@@ -80,7 +83,7 @@ public class Hud {
         int y_pos = 15;
 
         nvgBeginPath(vg);
-        nvgRoundedRect(vg,10, 10, hudWidth, 165, 20);
+        nvgRoundedRect(vg,10, 10, hudWidth, 250, 20);
         nvgFillColor(vg, rgba(0x0, 0x0, 0x0, 200, colour));
         nvgFill(vg);
 
@@ -132,6 +135,45 @@ public class Hud {
         else
             nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
         nvgText(vg, hudWidth/2, y_pos,MSAATxt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[5])
+            if (GameSettings.getRES() == 0)
+                nvgFillColor(vg, rgba(0xff, 0x00, 0x00, 255, colour));
+            else
+                nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, RES1Txt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[6])
+            if (GameSettings.getRES() == 1)
+                nvgFillColor(vg, rgba(0xff, 0x00, 0x00, 255, colour));
+            else
+                nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, RES2Txt);
+
+        y_pos += y_offset;
+        nvgFontSize(vg, 25.0f);
+        nvgFontFace(vg, FONT_NAME);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        if (!hover[7])
+            if (GameSettings.getRES() == 2)
+                nvgFillColor(vg, rgba(0xff, 0x00, 0x00, 255, colour));
+            else
+                nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 255, colour));
+        else
+            nvgFillColor(vg, rgba(0xff, 0xff, 0xff, 255, colour));
+        nvgText(vg, hudWidth/2, y_pos, RES3Txt);
 
     }
 
@@ -192,13 +234,7 @@ public class Hud {
         triMinTxt = GameSettings.isMinTrilinear()? "Trilinear Min filtering - ON": "Trilinear Min filtering - OFF";
         lodTxt = "Level of details bias: " + GameSettings.getLodBias();
         MSAATxt = GameSettings.isMSAA()? "AntiAliasing (MSAA) - ON" : "AntiAliasing (MSAA) - OFF";
-    }
 
-    public void incCounter() {
-        counter++;
-        if (counter > 99) {
-            counter = 0;
-        }
     }
 
     private NVGColor rgba(int r, int g, int b, int a, NVGColor colour) {

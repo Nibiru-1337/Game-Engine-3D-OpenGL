@@ -5,8 +5,11 @@ public final class GameSettings {
     private static boolean MAG_LINEAR = false;
     private static boolean MIN_TRILINEAR = false;
     private static int LOD_BIAS = 0;
-    private static boolean MSAA = true;
+    private static boolean MSAA = false;
+    // https://learnopengl.com/#!Advanced-OpenGL/Anti-Aliasing
     private static boolean FOG = true;
+    private static int RES = 1;
+    private static boolean HUD = true;
 
 
     private GameSettings(){}
@@ -27,6 +30,10 @@ public final class GameSettings {
     public static boolean isFOG() {
         return FOG;
     }
+    public static int getRES() {return RES; }
+    public static boolean isHUD() {
+        return HUD;
+    }
 
     public static void toggleMagLinear(){
         MAG_LINEAR = !MAG_LINEAR;
@@ -42,5 +49,11 @@ public final class GameSettings {
     }
     public static void toggleFog() {
         GameSettings.FOG = !GameSettings.FOG;
+    }
+    public static void setRES(int res){
+        RES = res;
+    }
+    public static void toggleHUD() {
+        GameSettings.HUD = !GameSettings.HUD;
     }
 }

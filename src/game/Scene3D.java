@@ -15,6 +15,7 @@ import java.nio.DoubleBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 
 public class Scene3D implements IGameLogic {
@@ -30,9 +31,12 @@ public class Scene3D implements IGameLogic {
     private float lightAngle;
     private float lightLamp;
 
+    private boolean pressedE;
     private boolean rightMouse;
     private DoubleBuffer posx;
     private DoubleBuffer posy;
+    private Mesh seaMesh;
+
     Scene3D(){
         renderer = new Renderer3D();
         hud = new Hud();
@@ -41,6 +45,7 @@ public class Scene3D implements IGameLogic {
         lightAngle = 0;
         lightLamp = 1.0f;
         rightMouse = false;
+        pressedE = false;
     }
 
     @Override
@@ -57,10 +62,10 @@ public class Scene3D implements IGameLogic {
         sphereMesh.setMaterial(sand);
 
         PlaneMesh plane = new PlaneMesh();
-        Mesh floorMesh = new Mesh(plane.getPositions(), plane.getTexCoords(),plane.getNormals(), plane.getIndices());
+        seaMesh = new Mesh(plane.getPositions(), plane.getTexCoords(),plane.getNormals(), plane.getIndices());
         Material seaMaterial = new Material(new Texture("src/resources/textures/sea.png"));
         //Material blue = new Material(new Vector4f(0.0f,0.4f,0.6f, 1f), reflectance);
-        floorMesh.setMaterial(seaMaterial);
+        seaMesh.setMaterial(seaMaterial);
 
         Mesh palmMesh = OBJLoader.loadMesh("src/resources/models/palm_tree.obj");
         Material palmMaterial = new Material(new Texture("src/resources/models/palm-tex3.png"));
@@ -93,7 +98,7 @@ public class Scene3D implements IGameLogic {
         island.setPosition(0, -1.5f, -5);
         island.setRotation(0,0,180f);
 
-        GameItem sea = new GameItem(floorMesh);
+        GameItem sea = new GameItem(seaMesh);
         sea.setScale(new Vector3f(10.0f));
         sea.setPosition(0, -0.1f, -2.5f);
         sea.setRotation(90f,0f,0);
@@ -108,7 +113,7 @@ public class Scene3D implements IGameLogic {
 
         // Setup  SkyBox
         SkyBox skyBox = new SkyBox("src/resources/skybox/skybox.obj", "src/resources/skybox/skybox2.png");
-        skyBox.setScale(8f);
+        skyBox.setScale(10f);
         scene.setSkyBox(skyBox);
 
         setUpLight();
@@ -144,7 +149,22 @@ public class Scene3D implements IGameLogic {
             if (lightLamp > 0.9f)
                 lightLamp = 0.0f;
             lightLamp += 0.01f;
+        } else if (window.isKeyPressed(GLFW_KEY_1)){
+            Texture sea = new Texture("src/resources/textures/sea.png");
+            seaMesh.getMaterial().setTexture(sea);
+
+        } else if (window.isKeyPressed(GLFW_KEY_2)) {
+            Texture sea = new Texture("src/resources/textures/sea2.png");
+            seaMesh.getMaterial().setTexture(sea);
         }
+
+        // HUD toggle
+        if (!pressedE && window.isKeyPressed(GLFW_KEY_E)) {
+            pressedE = true;
+            GameSettings.toggleHUD();
+        } else if (pressedE && !window.isKeyPressed(GLFW_KEY_E))
+            pressedE = false;
+
 
         // HUD mouse interaction
         glfwGetCursorPos(window.getWindowHandle(), posx, posy);
@@ -152,21 +172,21 @@ public class Scene3D implements IGameLogic {
         int x = (int) posx.get(0);
         int y = (int) posy.get(0);
 
-        if (!rightMouse && pressed) {
+        if (GameSettings.isHUD() && !rightMouse && pressed) {
             rightMouse = pressed;
             // mouse click detected
-            reactToMouse(x, y, true);
+            reactToMouse(x, y, true, window);
         } else
-            reactToMouse(x,y, false);
-        if (rightMouse && !pressed){
+            reactToMouse(x,y, false, window);
+        if (GameSettings.isHUD() && rightMouse && !pressed){
             rightMouse = pressed;
         }
     }
 
-    public void reactToMouse(int x, int y, boolean click) throws Exception {
+    public void reactToMouse(int x, int y, boolean click, Window window) throws Exception {
         if (15 < x && x < hud.hudWidth) {
             int lb = 15, ub = 45;
-            for (int i=0; i < 5; i++) {
+            for (int i=0; i < 8; i++) {
                 if (lb < y && y < ub) {
                     hud.hover(i, true);
                     if (click) {
@@ -202,6 +222,26 @@ public class Scene3D implements IGameLogic {
                                 break;
                             case 4:
                                 GameSettings.toggleMSAA();
+                                if (GameSettings.isMSAA()) {
+                                    glfwWindowHint(GLFW_SAMPLES, 4);
+                                    glEnable(GL_MULTISAMPLE);
+                                }
+                                else {
+                                    glfwWindowHint(GLFW_SAMPLES, 0);
+                                    glDisable(GL_MULTISAMPLE);
+                                }
+                                break;
+                            case 5:
+                                GameSettings.setRES(0);
+                                glfwSetWindowSize(window.getWindowHandle(), 1920, 1080);
+                                break;
+                            case 6:
+                                GameSettings.setRES(1);
+                                glfwSetWindowSize(window.getWindowHandle(), 1600, 900);
+                                break;
+                            case 7:
+                                GameSettings.setRES(2);
+                                glfwSetWindowSize(window.getWindowHandle(), 1280, 1024);
                                 break;
                         }
                     }
@@ -265,7 +305,8 @@ public class Scene3D implements IGameLogic {
     @Override
     public void render(Window window) {
         renderer.render(window, camera, scene);
-        hud.render(window);
+        if (GameSettings.isHUD())
+            hud.render(window);
     }
 
     @Override

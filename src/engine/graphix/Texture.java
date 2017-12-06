@@ -8,9 +8,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import static org.lwjgl.opengl.ARBFramebufferObject.glGenFramebuffers;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_FILTER_CONTROL;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE;
+import static org.lwjglx.debug.opengl.ARBFramebufferObject.glBindFramebuffer;
 
 public class Texture {
 
